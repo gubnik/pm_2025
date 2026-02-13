@@ -1,0 +1,345 @@
+\documentclass[14pt]{extarticle}
+
+\usepackage{fontspec}
+\usepackage{geometry}
+\geometry{a4paper, left=30mm, right=10mm, top=20mm, bottom=20mm}
+\usepackage[hidelinks]{hyperref}
+\usepackage{polyglossia}
+\usepackage{titlesec}
+\usepackage{pgfplots}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{tikz}
+\usepackage{pgf}
+\usepackage{xcolor}
+\usepackage{breqn}
+\usepackage{natbib}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{footmisc}
+\usepackage{unicode-math}
+\usepackage{gensymb}
+
+\usepackage{setspace}
+\onehalfspacing
+
+\setlength{\parindent}{12.7mm}
+
+\usepackage{ragged2e}
+\raggedbottom
+\sloppy
+\justifying
+
+\pagestyle{fancy}
+\bibliographystyle{plain}
+\setmainfont{Times New Roman}[size=14pt]
+\setdefaultlanguage{russian}
+\usepackage[utf8]{inputenc}
+
+\begin{document}
+\include{gen.titlepage}
+\tableofcontents
+\fancyhead[L]{\textit{\leftmark}}
+\fancyhead[R]{}
+\fancyfoot[C]{\thepage}
+\clearpage
+
+\section{Аннотация}
+\paragraph{Цель работы.} Разработать портативный поршневой насос полевого назначения, обеспечивающий подачу воды
+с обеспечением параметров расхода и напора, соответствующим требованиям ГОСТ, с минимизацией пульсации
+\footnote{Пульсация -- периодические колебания скорости или расхода жидкости, проходящий через элемент гидравлической системы}
+потока и обеспечением безопасности эксплуатации.
+
+\paragraph{Задачи проекта.}
+\begin{enumerate}
+    \item Проведение метрического синтеза и кинематического анализа кривошипно-ползунного механизма с
+    тремя цилиндрами.
+    \item Выполнение силового расчёта механизма для определения нагрузок в кинематических парах и
+    приводного момента.
+    \item Проведение уточнённого силового расчёта с учётом сил инерции и масс звеньев.
+    \item Прочностной расчёт звеньев (кривошипа и шатуна) и выбор рациональных сечений и материалов.
+    \item Разработка 3D-моделей звеньев и сборки механизма в САПР.
+    \item Проведение МКЭ-анализа (метод конечных элементов) для проверки прочности и оптимизации
+    геометрии деталей.
+    \item Создание итоговой конструкторской документации и информационной MDM-модели механизма.
+    \item Изготовление прототипа механизма методом 3D-печати и проверка его работоспособности.
+\end{enumerate}
+
+\paragraph{Методы и средства реализации.}
+В ходе проектирования применялись методы теории механизмов и машин (ТММ), методы инженерных расчётов на прочность,
+а также современные технологии компьютерного моделирования и анализа.
+Работа выполнялась с использованием следующих средств:
+\begin{enumerate}
+    \item \textbf{Компас 3D:} для трёхмерного параметрического моделирования деталей и сборки, создания чертежей,
+        проведения анализа путём МКЭ в модуле FEM;
+    \item \textbf{Аналитические расчёты с использованием Python:} для выполнения кинематического и силового анализа,
+        построения графиков скоростей, ускорений, моментов и реакций;
+    \item \textbf{Инженерные справочники и нормативы:} СНиП 2.04.01-85*, ГОСТ 1050-2013 для определения
+        расходных характеристик, выбора материалов и коэффециентов;
+    \item \textbf{Технологии 3D-печати (FDM\footnote{FDM -- Fused Deposition Modeling}):} для изгототовления прототипа, демонстрирующего работоспособность
+        кинематической схемы.
+\end{enumerate}
+
+\clearpage
+\section{Введение}
+В условиях полевой эксплуатации, удалённых работ и временного размещения практической необходимостью является
+обеспечение подачи воды, в том числе в удалённые от водных ресурсов места. Текущие решения имеют ряд недостатков,
+таких как зависимость от центральной системы водоснабжения, громоздкость и недостаточный напор.
+
+Целью данной курсовой работы является проектирование и прототипирование рабочего узла переносного поршневого насоса,
+отвечающего требованиям по мобильности\footnote{В данной работе под мобильностью понимается максимально допустимая
+габаритно-весовая характеристики изделия для транспортировки.} и необходимому напору для свободной эксплуатации
+в вышеописанных условиях.
+
+В процессе проектирования будет решен следующий ряд задач:
+\begin{itemize}
+    \item метрический синтез
+    \item кинематический анализ
+    \item силовой анализ
+    \item определение форм сечений
+    \item уточненный расчёт с учетом сил инерции
+    \item проверка прочности
+    \item оптимизация конструкции
+\end{itemize}
+
+Проектирование проводится на основе выделенного варианта кривошипно-ползунного механизма (рисунок \ref{fig:primary_mechanism}).
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5875\linewidth]{img/primary_mechanism.png}
+    \caption{Изображение исходного механизма.}
+    \label{fig:primary_mechanism}
+\end{figure}
+
+В качестве идейной основы для характеристик конечного изделия были взяты характеристики умывальника по документу
+СНиП 2.04.01-85*(\ref{fig:washbasin_specs})
+
+\clearpage
+\section{Качественные характеристики}
+
+\clearpage
+\section{Количественные характеристики}
+Исходя из СНиП 2.04.01-85*(\ref{fig:washbasin_specs}), запишем следующие целевые характеристики:
+\begin{itemize}
+    \item секундный расход воды, л/с: {{ (Q * 1000) | round(1) }}
+    \item секундный расход воды в кубических метрах: $Q = {{ Q | round(4) }}$
+\end{itemize}
+
+\subsection{Полезная нагрузка}
+В качестве полезной нагрузки примем сопротивление жидкости (характеризуем ее давлением);
+тогда, рассчитаем полезную нагрузку для подъема воды на расстояние 30 метров
+\footnote{Высота 30 метров была принята для обеспечения запасной мощности насоса.}:
+\begin{equation}
+    P = {{ latex(P) }}
+    \label{eq:liquid_pressure}
+\end{equation}
+, где
+\begin{itemize}
+    \item $P$ -- давление, Па;
+    \item $\rho$ -- плотность жидкости, кг/$\text{м}^3$;
+    \item $g$ -- ускорение свободного падения, \approx 9.81 м/$\text{с}^2$;
+    \item $H$ -- напор, м.
+\end{itemize}
+
+Целевые значения для нашего механизма составляют:
+\begin{itemize}
+    \item $\rho = {{rho}}$ кг/$\text{м}^3$ (для учета загрязненной и морской воды)
+    \item $H = {{H}}$ м
+\end{itemize}
+Таким образом:
+$$
+P = {{rho}} \cdot {{g}} \cdot {{H}}
+$$
+$$
+P = {{ P_val }} \text{ Па} = {{ (P_val / 1000000) | round(3)}} \text{ МПа}
+$$
+
+При рассчете давления необходимо учитывать потери, возникающие в трубопроводе. Эти потери зависят от длины труб, их диаметра,
+материала, количества изгибов и прочих факторов. Используем следующую формулу для учета этих потерь:
+\begin{equation}
+    \Delta P = {{latex(Delta_P) }}
+    \label{eq:pipe_loss}
+\end{equation}
+, где
+\begin{itemize}
+    \item $\Delta P$ -- потери давления, Па;
+    \item $\lambda_{fr}$ -- коэффициент гидравлического трения;
+    \item $L_{pipe}$ -- длина трубопровода, м;
+    \item $D_{pipe}$ -- диаметр трубопровода, м;
+    \item $\rho$ -- плотность жидкости, кг/$\text{м}^3$;
+    \item $v_{flow}$ -- скорость потока, м/с.
+\end{itemize}
+
+$$
+\Delta P = {{lambda_fr}} \cdot \left(\frac{ {{ L_pipe }} }{ {{ D_pipe }} } \right) \cdot \frac{\rho \cdot {{ v_flow | round(3) }}^{2}}{2}
+$$
+$$
+\Delta P = {{Delta_P_val | round(4)}}
+$$
+
+\subsection{Полезная мощность насоса}
+Мощность, сообщаемая насосом жидкости, подаваемой в напорный патрубок (\ref{eq:full_pump_power}):
+\begin{equation}
+    N = {{ latex(N) }}
+    \label{eq:full_pump_power}
+\end{equation}
+, где
+\begin{itemize}
+    \item $N$ -- полная мощность насоса, Вт;
+    \item $Q$ -- расход жидости, $\text{м}^3$/с;
+    \item $\rho$ -- плотность жидкости, кг/$\text{м}^3$;
+    \item $g \approx {{g}}$ м/$\text{с}^2$;
+    \item $H = {{H}}$ м.
+\end{itemize}
+$$
+N = {{ Q | round(4) }} \cdot {{ H }} \cdot {{ rho }} \cdot {{ g }}
+$$
+$$
+N = {{ N_val | round(4)}}
+$$
+Для получения мощности двигателя насоса, необходимо учесть КПД, возникающий в реальной конструкции;
+в случае нашего изделия, КПД $\eta_{\Sigma} \in \left[ 60\%, 95\% \right]$. Возьмем нижний порог,
+$\eta_{\Sigma} = 60\%$:
+\begin{equation}
+    N_{used} = {{ latex(N_used) }}
+    \label{eq:pump_power}
+\end{equation}
+$$
+N_{used} = \frac{ {{ N_used_val | round(4) }} }{ {{eta_Sigma | round(2)}} }
+$$
+$$
+N_{used} = {{N_used_val | round(3)}}
+$$
+
+\subsection{Пульсация}
+Пульсация -- периодические колебания скорости или расхода жидкости, проходящий через элемент гидравлической системы.
+Поршневой насос даёт неравномерную подачу, для выравнивания применяем многократность.
+Определим следующие функции для нахождения пульсации для нескольких цилиндров:
+\begin{align*}
+    & q(\phi) = \text{max}(0, sin(x)) \\
+    & q_\Sigma(\phi, n) = \sum_{k = 0}^{n - 1}q(x + \frac{2k\pi}{n}) \{\phi \ge 0\} \\
+    & \tilde{q}(\phi, n) = \frac{q_\Sigma(\phi, n)}{q_\Sigma(\frac{n\pi}{2})}
+\end{align*}
+, где \begin{itemize}
+    \item $\phi$ -- фаза цилиндра, рад.;
+    \item $n$ -- количество цилиндров в насосе;
+    \item $q(\phi)$ -- пульсация одного цилидра
+        \footnote{Ограничение на положительные значения введено так как в данном случае отрицательные значения не имеют физического смысла}
+        , относительный моментальный расход (\%);
+    \item $q_\Sigma(\phi, k)$ -- суммарная пульсация всех цилиндров, относительный моментальный расход (\%);
+    \item $\tilde{q}(\phi, k)$ -- нормированная суммарна пульсация всех цилиндров, относительный моментальный расход (\%).
+\end{itemize}
+Рассмотрим графики пульсации для 1, 3, 5 и 7 (рисунки \ref{fig:pulse_1}, \ref{fig:pulse_3}, \ref{fig:pulse_5} и \ref{fig:pulse_7} соответственно)
+цилиндров -- нечётное количество цилиндров дает более гладкий поток, уменьшает
+вибрации и позволяет реализовать более простую конструкцию, все эти факторы важны для нашего изделия.
+
+Заметим, что при одном цилиндре имеются периоды простоя с резкими пиками -- пульсация слишком сильная;
+при 5 и 7 цилиндрах пульсация выравнивается, но конструкция усложняется и на масштабе изделия является избыточной.
+
+{% for i in range (1, 7 + 1, 2) %}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\linewidth]{img/pulse_{{ i }}.png}
+    \caption{Графики нормированной пульсации для {{ i }} цилиндра(-ов)}
+    \label{ fig:pulse_{{ i }} }
+\end{figure}
+{% endfor %}
+
+\clearpage
+\section{Рассчетная часть}
+\subsection{Метрический синтез}
+Для метрического синтеза составим кинематическую схему механизма, обозначив характерные точки механизма (рисунок \ref{fig:cinematic_schema}):
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\linewidth]{img/cinematic_schema.png}
+    \caption{Кинематическая схема механизма}
+    \label{fig:cinematic_schema}
+\end{figure}
+
+При помощи кинематической схемы составим траектории точек и выразим уравнения.
+Возьмем за начало системы координат точку $A$, то есть ось кривошипа.
+Пусть $R$ -- длина кривошипа. Опишем точки:
+\begin{itemize}
+    \item Точка $A$:
+        \begin{align*}
+            x_A(\phi) &= 0 \\
+            y_A(\phi) &= 0
+        \end{align*}
+    \item Точка $B$:
+        \begin{align*}
+            x_B(\phi) &= R \cdot \cos{\phi} \\
+            y_B(\phi) &= R \cdot \sin{\phi}
+        \end{align*}
+    \item Точка $C$:
+        \begin{align*}
+            x_C(\phi) &= R \cdot \cos{\phi} + \sqrt{L^2 - R^2 \cdot \sin^2{\phi}} \\
+            y_C(\phi) &= 0
+        \end{align*}
+    \item Точка $D$:
+        \begin{align*}
+            x_D(\phi) &= 0 \\
+            y_D(\phi) &= 0
+        \end{align*}
+\end{itemize}
+
+Характерные точки: $E$ и $F$ - середины кривошипа и шатуна (звеньев 1 и 2 соответственно):
+\begin{itemize}
+    \item Точка $E$:
+        \begin{align*}
+            x_E(\phi) &= R \cdot \frac{1}{2}\cos{\phi} \\
+            y_E(\phi) &= R \cdot \frac{1}{2}\sin{\phi}
+        \end{align*}
+    \item Точка $F$:
+        \begin{align*}
+            x_F(\phi) &= R \cdot \cos{\phi} + \frac{1}{2}\sqrt{L^2 - R^2 \cdot \sin^2{\phi}} \\
+            y_F(\phi) &= \frac{1}{2}R \cdot \sin{\phi}
+        \end{align*}
+\end{itemize}
+
+Из уравнений $x_C(\phi)$ и $x_F(\phi)$ имеем, что $R \le L$, то есть длина кривошипа не больше его длины.
+
+\subsection{Длины}
+Вычислим длины компонентов. За значение $d$ возьмем сантихнический стандарт -- $1 \text{ дюйм } \approx 25.4 \text{ мм}$ и $\frac{3}{4}$ дюйма:
+\begin{align*}
+    & A = \frac{Q}{2Rzn\eta_v} = {{latex(A)}} \\
+    & R = {{latex(R)}} \\
+    & S = 2 \cdot R = {{latex(S)}} \\
+    & \lambda_{len} = \frac{L}{R}, \text{ пусть } \lambda = 3 \\
+    & L = \lambda_{len} = {{ latex(L) }} \\
+    % & v_{\text{max}} \approx \omega \cdot R \\
+    & F = P A = {{latex(F)}}
+\end{align*}
+Подставим численные значения:
+\begin{itemize}
+{% for d in [25.4 / 1000, 19.05 / 1000] %}
+\item Возьмем $d  = {{ (d * 1000) | round(2) }} \text{ мм}$:
+\begin{align*}
+    & A = {{ (as_fun('d', A_val)(d) * 10000) | round(4)}}\text{ мм}^{-2} \\ 
+    & R = {{ (as_fun('d', R_val)(d) * 1000) | round(4)}}\text{ мм} \\ 
+    & S = {{ (as_fun('d', S_val)(d) * 1000) | round(4)}}\text{ мм} \\ 
+    & L = {{ (as_fun('d', L_val)(d) * 1000) | round(4)}}\text{ мм} \\ 
+    & F = {{  as_fun('d', F_val)(d) | round(4)}}\text{ Н} \\
+\end{align*}
+{% endfor %}
+\end{itemize}
+
+В случае $d = 25.4$мм механизм получается слишком коротким и слишком широким -- возьмем $d = \frac{3}{4} \cdot 25.4 = 19.05$мм.
+
+\clearpage
+\section{Приложения}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\linewidth]{img/washbasin_specs.png}
+    \caption{Характеристики умывальника согласно документу СНиП 2.04.01-85*}
+    \label{fig:washbasin_specs}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\linewidth]{img/pump_specs.png}
+    \caption{TODO}
+    \label{fig:pump_specs}
+\end{figure}
+
+\end{document}
