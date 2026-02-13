@@ -2,11 +2,8 @@
 
 from jinja2 import Environment, FileSystemLoader
 import sys
-import math
-from typing import Callable
-import numpy as np
-import matplotlib.pyplot as plt
 import sympy as sp
+
 if __name__ == "__main__":
     if (len(sys.argv) != 3):
         exit(1)
