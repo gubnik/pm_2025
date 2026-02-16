@@ -4,6 +4,7 @@ import math
 from typing import Callable
 import numpy as np
 import matplotlib.pyplot as plt
+import sympy as sp
 
 def min_in_range(f: Callable, test_range: np.ndarray, **kwargs):
     return min([f(i, **kwargs) for i in test_range])
@@ -39,4 +40,3 @@ if __name__ == "__main__":
                     x_label="Фаза цилиндра (phi)",
                     y_label="Относительный моментальный расход (%)",
                     do_pi_labels=True)
- 

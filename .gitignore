@@ -4,3 +4,5 @@
 *.log
 *.pdf
 gen*
+img/gen
+__pycache__

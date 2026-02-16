@@ -259,43 +259,17 @@ $$
 
 При помощи кинематической схемы составим траектории точек и выразим уравнения.
 Возьмем за начало системы координат точку $A$, то есть ось кривошипа.
-Пусть $R$ -- длина кривошипа. Опишем точки:
+Пусть $R$ -- длина кривошипа. Опишем координаты точек:
 \begin{itemize}
-    \item Точка $A$:
-        \begin{align*}
-            x_A(\phi) &= 0 \\
-            y_A(\phi) &= 0
-        \end{align*}
-    \item Точка $B$:
-        \begin{align*}
-            x_B(\phi) &= R \cdot \cos{\phi} \\
-            y_B(\phi) &= R \cdot \sin{\phi}
-        \end{align*}
-    \item Точка $C$:
-        \begin{align*}
-            x_C(\phi) &= R \cdot \cos{\phi} + \sqrt{L^2 - R^2 \cdot \sin^2{\phi}} \\
-            y_C(\phi) &= 0
-        \end{align*}
-    \item Точка $D$:
-        \begin{align*}
-            x_D(\phi) &= 0 \\
-            y_D(\phi) &= 0
-        \end{align*}
+{% for p in points %}
+\item Точка ${{ p }}$:
+    \begin{align*}
+        x_{{ p }}(\phi) &= {{ phi_print(ctx['x_'+p]) }} \\
+        y_{{ p }}(\phi) &= {{ phi_print(ctx['y_'+p]) }}
+    \end{align*}
+{% endfor %}
 \end{itemize}
-
 Характерные точки: $E$ и $F$ - середины кривошипа и шатуна (звеньев 1 и 2 соответственно):
-\begin{itemize}
-    \item Точка $E$:
-        \begin{align*}
-            x_E(\phi) &= R \cdot \frac{1}{2}\cos{\phi} \\
-            y_E(\phi) &= R \cdot \frac{1}{2}\sin{\phi}
-        \end{align*}
-    \item Точка $F$:
-        \begin{align*}
-            x_F(\phi) &= R \cdot \cos{\phi} + \frac{1}{2}\sqrt{L^2 - R^2 \cdot \sin^2{\phi}} \\
-            y_F(\phi) &= \frac{1}{2}R \cdot \sin{\phi}
-        \end{align*}
-\end{itemize}
 
 Из уравнений $x_C(\phi)$ и $x_F(\phi)$ имеем, что $R \le L$, то есть длина кривошипа не больше его длины.
 
@@ -310,6 +284,7 @@ $$
     % & v_{\text{max}} \approx \omega \cdot R \\
     & F = P A = {{latex(F)}}
 \end{align*}
+
 Подставим численные значения:
 \begin{itemize}
 {% for d in [25.4 / 1000, 19.05 / 1000] %}
@@ -325,6 +300,19 @@ $$
 \end{itemize}
 
 В случае $d = 25.4$мм механизм получается слишком коротким и слишком широким -- возьмем $d = \frac{3}{4} \cdot 25.4 = 19.05$мм.
+
+\subsection{Кинематический анализ}
+
+\subsection{Скорости точек}
+\begin{itemize}
+{% for p in points %}
+\item Точка ${{ p }}$:
+    \begin{align*}
+        \dot{x}_{{ p }}(\phi) &= {{ phi_print(ctx['v_x_'+p]) }} = {{ phi_print(subs(ctx['v_x_'+p], diff(phi), symb('omega'))) }}\\
+        \dot{y}_{{ p }}(\phi) &= {{ phi_print(ctx['v_y_'+p]) }} = {{ phi_print(subs(ctx['v_y_'+p], diff(phi), symb('omega'))) }}
+    \end{align*}
+{% endfor %}
+\end{itemize}
 
 \clearpage
 \section{Приложения}
