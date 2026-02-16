@@ -1,4 +1,4 @@
-\documentclass[14pt]{extarticle}
+\documentclass[12pt]{extarticle}
 
 \usepackage{fontspec}
 \usepackage{geometry}
@@ -241,7 +241,7 @@ $$
     \centering
     \includegraphics[width=\linewidth]{img/gen/pulse_{{ i }}.png}
     \caption{Графики нормированной пульсации для {{ i }} цилиндра(-ов)}
-    \label{ fig:pulse_{{ i }} }
+    \label{fig:pulse_{{ i -}}}
 \end{figure}
 {% endfor %}
 
@@ -308,10 +308,31 @@ $$
 {% for p in points %}
 \item Точка ${{ p }}$:
     \begin{align*}
-        \dot{x}_{{ p }}(\phi) &= {{ phi_print(ctx['v_x_'+p]) }} = {{ phi_print(subs(ctx['v_x_'+p], diff(phi), symb('omega'))) }}\\
-        \dot{y}_{{ p }}(\phi) &= {{ phi_print(ctx['v_y_'+p]) }} = {{ phi_print(subs(ctx['v_y_'+p], diff(phi), symb('omega'))) }}
+        \dot{x}_{{ p }}(\phi) &= {{ phi_print(ctx['v_x_'+p]) }} \\
+                              &= {{ phi_print(subs(ctx['v_x_'+p], diff(phi), symb('omega'))) }}\\
+        \dot{y}_{{ p }}(\phi) &= {{ phi_print(ctx['v_y_'+p]) }} \\
+                              &= {{ phi_print(subs(ctx['v_y_'+p], diff(phi), symb('omega'))) }}
     \end{align*}
 {% endfor %}
+\end{itemize}
+\begin{itemize}
+{% for p in points %}
+\item Точка ${{ p }}$:
+    \begin{align*}
+        \dot{x}_{{ p }}(\phi) &= {{ phi_print(ctx['v_x_'+p]) -}} \\
+        {% set v_x_first = phi_print(ctx['v_x_'+p]) -%}
+        {% set v_x_second = phi_print(subs(ctx['v_x_'+p], diff(phi), symb('omega'))) -%}
+        {% if v_x_first != v_x_second -%}
+            &= {{ v_x_second -}}\\
+        {% endif -%}
+        \dot{y}_{{ p }}(\phi) &= {{ phi_print(ctx['v_y_'+p]) -}} \\
+        {% set v_y_first = phi_print(ctx['v_y_'+p]) -%}
+        {% set v_y_second = phi_print(subs(ctx['v_y_'+p], diff(phi), symb('omega'))) -%}
+        {% if v_y_first != v_y_second -%}
+            &= {{ v_y_second -}}\\
+        {% endif -%}
+    \end{align*}
+{% endfor -%}
 \end{itemize}
 
 \clearpage

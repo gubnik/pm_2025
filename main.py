@@ -1,5 +1,6 @@
 #!/bin/python3
 
+import inspect
 from jinja2 import Environment, FileSystemLoader
 import sys
 import math
@@ -31,13 +32,13 @@ def constants():
     return locals()
 
 def equations():
-    t = sp.symbols('t')
     Q, rho, g, H = sp.symbols('Q rho g H')
     P = rho * g * H
     lambda_fr, L_pipe, D_pipe, v_flow = sp.symbols('lambda_fr L_pipe D_pipe v_flow')
     Delta_P = lambda_fr * L_pipe * rho * (v_flow ** 2) / (2 * D_pipe)
     eta_Sigma = sp.symbols('eta_Sigma')
     R, L = sp.symbols('R L')
+    t = sp.symbols('t')
     phi_f = sp.Function('phi')
     phi = phi_f(t)
     x_A = R*0
@@ -54,13 +55,12 @@ def equations():
     y_F = R * sp.sin(phi) / 2
 
     vels = {}
+    omega = 5 * sp.pi * 2
     for p in points:
         vel_xp = sp.diff(locals()[f'x_{p}'], t)
         vel_yp = sp.diff(locals()[f'y_{p}'], t)
         vels[f'v_x_{p}'] = vel_xp
         vels[f'v_y_{p}'] = vel_yp
-        print(f"v_x_{p} = {printer.phi_print(vel_xp)}")
-        print(f"v_y_{p} = {printer.phi_print(vel_yp)}")
 
     d, z, n, eta_v, lamb = sp.symbols('d z n eta_v lambda_len')
     A = sp.pi * (d**2) / 4
