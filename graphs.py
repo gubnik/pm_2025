@@ -1,6 +1,4 @@
-import inspect
-from operator import le
-from jinja2 import Environment, FileSystemLoader
+from datetime import time
 import sys
 import math
 from typing import Callable
@@ -10,17 +8,22 @@ import sympy as sp
 from main import points
 from main import constants, equations, substitutes
 
+
 def min_in_range(f: Callable, test_range: np.ndarray, **kwargs):
     return min([f(i, **kwargs) for i in test_range])
+
 
 def q_fn(phi: float) -> float:
     return max(0, math.sin(phi))
 
+
 def q_Sigma_fn(phi: float, n: int) -> float:
     return sum(q_fn(phi + (2 * math.pi * k)/n) for k in range(0, n))
 
+
 def q_Norm_fn(phi: float, n: int) -> float:
     return q_Sigma_fn(phi, n) / q_Sigma_fn(n * np.pi / 2, n)
+
 
 def plot_to_png(filename: str, f: Callable, test_range: np.ndarray, x_label: str, y_label: str, do_pi_labels: bool = False):
     vals = [f(i) for i in test_range]
@@ -87,16 +90,23 @@ if __name__ == "__main__":
         v_y_f = sp.lambdify(phi_symb, v_y)
         v_y_fs.append(v_y_f)
     plot_multiple(filename=f"img/gen/vel_x.png",
-                functions=v_x_fs,
-                legend=[f"Точка {p}" for p in points],
-                test_range=np.arange(0, 2 * np.pi, 0.01),
-                x_label="phi, фаза вращения цилиндра, радианы",
-                y_label=f"v_x, скорость по оси x, м/с",
-                do_pi_labels=True)
+                  functions=v_x_fs,
+                  legend=[f"Точка {p}" for p in points],
+                  test_range=np.arange(0, 2 * np.pi, 0.01),
+                  x_label="phi, фаза вращения цилиндра, радианы",
+                  y_label=f"v_x, скорость по оси x, м/с",
+                  do_pi_labels=True)
     plot_multiple(filename=f"img/gen/vel_y.png",
-                functions=v_y_fs,
-                legend=[f"Точка {p}" for p in points],
-                test_range=np.arange(0, 2 * np.pi, 0.01),
-                x_label="phi, фаза вращения цилиндра, радианы",
-                y_label=f"v_x, скорость по оси y, м/с",
+                  functions=v_y_fs,
+                  legend=[f"Точка {p}" for p in points],
+                  test_range=np.arange(0, 2 * np.pi, 0.01),
+                  x_label="phi, фаза вращения цилиндра, радианы",
+                  y_label=f"v_x, скорость по оси y, м/с",
+                  do_pi_labels=True)
+    plot_multiple(filename=f"img/gen/vel_mod.png",
+                  functions=[lambda phi, v_x_f=v_x_f, v_y_f=v_y_f: math.sqrt(v_x_f(phi)**2 + v_y_f(phi)**2) for v_x_f, v_y_f in zip(v_x_fs, v_y_fs)],
+                  legend=[f"Точка {p}" for p in points],
+                  test_range=np.arange(0, 2 * np.pi, 0.01),
+                  x_label="phi, фаза вращения цилиндра, радианы",
+                  y_label=f"v_x, скорость по оси y, м/с",
                 do_pi_labels=True)
