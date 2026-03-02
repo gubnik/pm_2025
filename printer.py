@@ -13,11 +13,11 @@ class PhiPrinter(LatexPrinter):
         if f.func.__name__ == 'phi':
             order = len(expr.variables)
             if order == 1:
-                return r'\dot{\phi}'
+                return r'\omega{\phi}'
             elif order == 2:
-                return r'\ddot{\phi}'
+                return r'\dot{omega{\phi}}'
             else:
-                return r'\phi^{(%d)}' % order
+                return r'\text{get rekt idiot}' % order
         return super()._print_Derivative(expr)
 
 def phi_print(expr):

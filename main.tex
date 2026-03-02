@@ -6,12 +6,9 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{polyglossia}
 \usepackage{titlesec}
-\usepackage{pgfplots}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{array}
-\usepackage{tikz}
-\usepackage{pgf}
 \usepackage{xcolor}
 \usepackage{breqn}
 \usepackage{natbib}
@@ -20,11 +17,13 @@
 \usepackage{footmisc}
 \usepackage{unicode-math}
 \usepackage{gensymb}
+\usepackage{mathtools}
 
 \usepackage{setspace}
 \onehalfspacing
 
 \setlength{\parindent}{12.7mm}
+\setlength{\headheight}{15pt}%\baselineskip}
 
 \usepackage{ragged2e}
 \raggedbottom
@@ -33,7 +32,7 @@
 
 \pagestyle{fancy}
 \bibliographystyle{plain}
-\setmainfont{Times New Roman}[size=14pt]
+\setmainfont{Times New Roman}[size=12pt]
 \setdefaultlanguage{russian}
 \usepackage[utf8]{inputenc}
 
@@ -104,7 +103,7 @@
 \end{itemize}
 
 Проектирование проводится на основе выделенного варианта кривошипно-ползунного механизма (рисунок \ref{fig:primary_mechanism}).
-\begin{figure}[h!]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=0.5875\linewidth]{img/primary_mechanism.png}
     \caption{Изображение исходного механизма.}
@@ -116,6 +115,7 @@
 
 \clearpage
 \section{Качественные характеристики}
+TODO: ???
 
 \clearpage
 \section{Количественные характеристики}
@@ -202,7 +202,7 @@ $$
 $\eta_{\Sigma} = 60\%$:
 \begin{equation}
     N_{used} = {{ latex(N_used) }}
-    \label{eq:pump_power}
+    \label{eq:pump_force}
 \end{equation}
 $$
 N_{used} = \frac{ {{ N_used_val | round(4) }} }{ {{eta_Sigma | round(2)}} }
@@ -217,7 +217,7 @@ $$
 Определим следующие функции для нахождения пульсации для нескольких цилиндров:
 \begin{align*}
     & q(\phi) = \text{max}(0, sin(x)) \\
-    & q_\Sigma(\phi, n) = \sum_{k = 0}^{n - 1}q(x + \frac{2k\pi}{n}) \{\phi \ge 0\} \\
+    & q_\Sigma(\phi, n) = \sum_{k = 0}^{n - 1}q(x + \frac{2k\pi}{n}) \\
     & \tilde{q}(\phi, n) = \frac{q_\Sigma(\phi, n)}{q_\Sigma(\frac{n\pi}{2})}
 \end{align*}
 , где \begin{itemize}
@@ -237,7 +237,7 @@ $$
 при 5 и 7 цилиндрах пульсация выравнивается, но конструкция усложняется и на масштабе изделия является избыточной.
 
 {% for i in range (1, 7 + 1, 2) %}
-\begin{figure}[h!]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=\linewidth]{img/gen/pulse_{{ i }}.png}
     \caption{Графики нормированной пульсации для {{ i }} цилиндра(-ов)}
@@ -250,7 +250,7 @@ $$
 \subsection{Метрический синтез}
 Для метрического синтеза составим кинематическую схему механизма, обозначив характерные точки механизма (рисунок \ref{fig:cinematic_schema}):
 
-\begin{figure}[h!]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=\linewidth]{img/cinematic_schema.png}
     \caption{Кинематическая схема механизма}
@@ -274,82 +274,68 @@ $$
 Из уравнений $x_C(\phi)$ и $x_F(\phi)$ имеем, что $R \le L$, то есть длина кривошипа не больше его длины.
 
 \subsection{Длины}
-Вычислим длины компонентов. За значение $d$ возьмем сантихнический стандарт -- $1 \text{ дюйм } \approx 25.4 \text{ мм}$ и $\frac{3}{4}$ дюйма:
+Опишем длины компонентов и силу, с которой должен действовать поршень. Длины можно найти как:
 \begin{align*}
-    & A = \frac{Q}{2Rzn\eta_v} = {{latex(A)}} \\
-    & R = {{latex(R)}} \\
-    & S = 2 \cdot R = {{latex(S)}} \\
+    & \text{Площадь поршня: } A_p = \frac{Q}{2Rzn\eta_v} = {{latex(A_p)}} \\
+    & \text{Длина плеча привошипа: } R = {{latex(R)}} \\
+    & \text{Путь и длина ползуна: } S = 2 \cdot R = {{latex(S)}} \\
     & \lambda_{len} = \frac{L}{R}, \text{ пусть } \lambda = 3 \\
-    & L = \lambda_{len} = {{ latex(L) }} \\
+    & \text{Длина плеча шатуна: } L = \lambda_{len} \cdot R = {{ latex(L) }} \\
     % & v_{\text{max}} \approx \omega \cdot R \\
-    & F = P A = {{latex(F)}}
-\end{align*}
-
-Подставим численные значения:
-\begin{itemize}
-{% for d in [25.4 / 1000, 19.05 / 1000] %}
-\item Возьмем $d  = {{ (d * 1000) | round(2) }} \text{ мм}$:
+\end{align*}\footnote{Значение $\lambda = 3$ было выбрано по аналогии с ДВС}
+В случае $d = 25.4$ мм \footnote{сантехнический дюйм} механизм получается слишком коротким и слишком широким -- возьмем $d = \frac{3}{4} \cdot 25.4 = 19.05$ мм.
+Округлим значения до целых милиметров:
+{% set A_p_set = as_fun('d', A_p_val)(19.05e-3) -%}
+{% set A_r_set = A_r_val -%}
+{% set R_set = as_fun('d', R_val)(19.05e-3) -%}
+{% set S_set = as_fun('d', S_val)(19.05e-3) -%}
+{% set L_set = as_fun('d', L_val)(19.05e-3) -%}
+{% set F_set = as_fun('d', F_val)(19.05e-3) -%}
 \begin{align*}
-    & A = {{ (as_fun('d', A_val)(d) * 10000) | round(4)}}\text{ мм}^{-2} \\ 
-    & R = {{ (as_fun('d', R_val)(d) * 1000) | round(4)}}\text{ мм} \\ 
-    & S = {{ (as_fun('d', S_val)(d) * 1000) | round(4)}}\text{ мм} \\ 
-    & L = {{ (as_fun('d', L_val)(d) * 1000) | round(4)}}\text{ мм} \\ 
-    & F = {{  as_fun('d', F_val)(d) | round(4)}}\text{ Н} \\
+    & A_p = {{ (A_p_set * 10000) | round(3)}}\text{ мм}^{-2} \\ 
+    & R = {{ ceil(R_set * 1000) | int }}\text{ мм} \\ 
+    & S = {{ ceil(S_set * 1000) | int }}\text{ мм} \\ 
+    & L = {{ ceil(L_set * 1000) | int }}\text{ мм} \\ 
 \end{align*}
-{% endfor %}
-\end{itemize}
-
-В случае $d = 25.4$мм механизм получается слишком коротким и слишком широким -- возьмем $d = \frac{3}{4} \cdot 25.4 = 19.05$мм.
 
 \subsection{Кинематический анализ}
+Используя длины получить скорости и ускорения 	
 
-\subsection{Скорости точек}
-\begin{itemize}
-{% for p in points %}
-\item Точка ${{ p }}$:
-    \begin{align*}
-        \dot{x}_{{ p }}(\phi) &= {{ phi_print(ctx['v_x_'+p]) }} \\
-                              &= {{ phi_print(subs(ctx['v_x_'+p], diff(phi), symb('omega'))) }}\\
-        \dot{y}_{{ p }}(\phi) &= {{ phi_print(ctx['v_y_'+p]) }} \\
-                              &= {{ phi_print(subs(ctx['v_y_'+p], diff(phi), symb('omega'))) }}
-    \end{align*}
-{% endfor %}
-\end{itemize}
+$v_{max} \approx k\omega R \le v_{lim} \Rightarrow n \le \frac{v_{lim}}{2\pi k R}$
+$k \approx 1 + \frac{R}{4L} = 1 + \frac{1}{4\lambda}$
+Скорость точки - первая производная;\\
+Ускорение - вторая производная.
+\begin{align*}
+    & \omega=\dot{\phi}=2\pi\cdot n=const \Rightarrow\\
+    & \dot{\omega} = 0
+\end{align*}
+
+\subsubsection{Скорости точек}
 \begin{itemize}
 {% for p in points %}
 \item Точка ${{ p }}$:
     \begin{align*}
         \dot{x}_{{ p }}(\phi) &= {{ phi_print(ctx['v_x_'+p]) -}} \\
-        {% set v_x_first = phi_print(ctx['v_x_'+p]) -%}
-        {% set v_x_second = phi_print(subs(ctx['v_x_'+p], diff(phi), symb('omega'))) -%}
-        {% if v_x_first != v_x_second -%}
-            &= {{ v_x_second -}}\\
-        {% endif -%}
-        \dot{y}_{{ p }}(\phi) &= {{ phi_print(ctx['v_y_'+p]) -}} \\
-        {% set v_y_first = phi_print(ctx['v_y_'+p]) -%}
-        {% set v_y_second = phi_print(subs(ctx['v_y_'+p], diff(phi), symb('omega'))) -%}
-        {% if v_y_first != v_y_second -%}
-            &= {{ v_y_second -}}\\
-        {% endif -%}
+        \dot{y}_{{ p }}(\phi) &= {{ phi_print(ctx['v_y_'+p]) -}}
     \end{align*}
 {% endfor -%}
 \end{itemize}
 
-\begin{figure}[h!]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=\linewidth]{img/gen/vel_x.png}
     \caption{График скоростей точек по оси OX}
     \label{fig:points_vel_x}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=\linewidth]{img/gen/vel_y.png}
     \caption{График скоростей точек по оси OY}
     \label{fig:points_vel_y}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=\linewidth]{img/gen/vel_mod.png}
     \caption{График модулей скоростей точек}
@@ -357,15 +343,760 @@ $$
 \end{figure}
 
 \clearpage
+\subsubsection{Ускорения точек}
+\begin{itemize}
+{% for p in points %}
+\item Точка ${{ p }}$:
+    \begin{align*}
+        \dot{x}_{{ p }}(\phi) &= {{ phi_print(ctx['a_x_'+p]) -}} \\
+        \dot{y}_{{ p }}(\phi) &= {{ phi_print(ctx['a_y_'+p]) -}} 
+    \end{align*}
+{% endfor -%}
+\end{itemize}
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{img/gen/acc_x.png}
+    \caption{График ускорений точек по оси OX}
+    \label{fig:points_acc_x}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{img/gen/acc_y.png}
+    \caption{График ускорений точек по оси OY}
+    \label{fig:points_acc_y}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{img/gen/acc_mod.png}
+    \caption{График модулей ускорений точек}
+    \label{fig:points_acc_mod}
+\end{figure}
+
+\clearpage
+\subsection{Первичный силовой анализ}
+
+\subsubsection{Реакции}
+Проведем первичный силовой анализ в квазистатическом режиме, без учёта масс и инерционных нагрузок.
+Соответственно, в этих условиях мы имеем лишь один источник силы: сопротивление жидкости, действующее
+на поршень (ползун). Обозначим эту силу как $F$.
+
+Опишем силу:
+\begin{equation}
+    F = P \cdot A
+    \label{eq:piston_force}
+\end{equation}
+Из имеющихся данных,
+$$
+F = {{ (F_set) | round(3) }}\text{ Н}
+$$
+
+Состави уравнения равновесия для точек $A$, $B$, $C$:
+\begin{equation}
+    \begin{cases}
+        \vec{F} + \vec{N} + \vec{Z_C} = \Sigma F_C = 0, &\text{ точка } C \\
+        \vec{Z_B} + \vec{Z_C} = \Sigma F_B = 0, &\text{ точка } B \\
+        \vec{Z_A} + \vec{Z_B} = \Sigma F_A = 0, &\text{ точка } A
+    \end{cases}
+    \label{eq:simple_balance}
+\end{equation}
+, где $Z_A$, $Z_B$, $Z_C$ -- реакции в шарнирах, $N$ -- суммарная реакция опоры ползуна.
+
+Пусть $\theta(\phi)$ — угол между шатуном и осью хода ползуна. Тогда из геометрии механизма:
+\begin{align*}
+    & \sin{\theta}= \frac{R \sin{\phi}} {L}, \\
+    & \cos{\theta}= \frac{\sqrt{L^{2} - R^{2} \sin^{2}(\phi)}} {L}, \\
+\end{align*}
+Запишем также выражение для $\tan{\theta}$:
+\begin{equation}
+    \tan{\theta}= \frac{R \sin{\phi}} {\sqrt{L^{2} - R^{2} \sin^{2}(\phi)}}
+    \label{eq:tan_theta}
+\end{equation}
+
+Введем силу $\vec{F_{BC}}$, действующую вдоль плеча шатуна. Опишем компоненты $\vec{Z_C}$ через $\vec{F_{BC}}$:
+\begin{align*}
+    & \vec{Z_{C}(\phi)}= \left[
+       \begin{matrix}
+           Z_{C_x} (\phi) \\ 
+           Z_{C_y}(\phi)
+       \end{matrix}
+       \right], \\
+    & Z_{C_x} = F_{BC} \cos{\theta},  Z_{C_y} =  F_{BC} \sin{\theta};
+\end{align*}
+Опишем компоненты $\vec{Z_C}$ по имеющемуся уравнению \ref{eq:simple_balance}:
+\begin{align*}
+    & \begin{cases} 
+        \sum\limits{\vec{F_{C_x}}}=0: Z_{C_x} - F = 0, \\ 
+        \sum\limits{\vec{F_{C_y}}}=0: N - Z_{C_y} = 0;
+    \end{cases} \\
+    & \begin{cases} 
+        Z_{C_x} - F=0 \ \ \  \Rightarrow \ \ \ Z_{C_x}=F,\\ 
+        N - Z_{C_y}=0 \ \ \  \Rightarrow \ \ \ Z_{C_y}=N;
+    \end{cases} \Rightarrow \left| Z_{C} \right|=\sqrt{Z^{2}_{C_x}+Z^{2}_{C_y}}=\sqrt{F^{2}+ N^{2}}
+\end{align*}
+
+Выразим $F_{BC}$ и $N$ через $F$:
+\begin{align*}
+    & F=Z_{C_x} \Rightarrow F=F_{BC}\cos{\theta} \\
+    & F_{BC}=\frac{F}{\cos{\theta}} \\
+    & N=Z_{C_y} \Rightarrow N=\frac{F}{\cos{\theta}}\cdot\sin{\theta}=F \cdot \tan{\theta}
+\end{align*}
+Таким образом, имеем компоненты $\vec{Z_C}$ выраженные через $F$:
+\begin{equation}
+    \begin{cases} 
+        \vec{Z_{C_x}}=F, \\ 
+        \vec{Z_{C_y}}=F \cdot \tan{\theta}.
+    \end{cases}
+    \label{eq:reactions_C}
+\end{equation}
+
+Рассмотрим реакции в шарнире $B$ шатуна; так как система безинерционная, имеем (из ур-я \ref{eq:simple_balance}):
+$\vec{Z_{C}}=-\vec{Z_{B}}$, т.е. реакции на концах шатуна равны по модулю и обратные по направлению.
+Подставим результат уравнения \ref{eq:reactions_C}:
+\begin{equation}
+    \begin{cases} 
+        \vec{Z_{B_x}}=-F, \\ 
+        \vec{Z_{B_y}}=-F \cdot \tan{\theta}.
+    \end{cases}
+    \label{eq:reactions_B}
+\end{equation}
+
+Аналогично, опишем реакции шарнира $A$ кривошипа:
+\begin{align*}
+    & \vec{Z_{A}(\phi)}= \left[
+        \begin{matrix}
+            Z_{A_p} (\phi) \\ 
+            Z_{A_p}(\phi)
+        \end{matrix}
+    \right],\\
+    & Z_{A_p} = F_{BC} \cos{\theta},  Z_{A_p} =  F_{BC} \sin{\theta}, \\
+    & \begin{cases} 
+        Z_{A_p}+Z_{B_x}=0 \ \ \  \Rightarrow \ \ \ Z_{A_p}=F,\\ 
+        Z_{A_p}+Z_{B_y}=0 \ \ \  \Rightarrow \ \ \ Z_{A_p}=F \cdot \tan{\theta}.
+    \end{cases} \Rightarrow \left|Z_{A}\right|=\sqrt{ Z ^{2} _{A_p} + Z ^{2} _{A_p} }
+\end{align*}
+\begin{equation}
+    \begin{cases} 
+        \vec{Z_{A_p}}=F, \\ 
+        \vec{Z_{A_p}}=F \cdot \tan{\theta}.
+    \end{cases}
+    \label{eq:reactions_A}
+\end{equation}
+{% for p in ['A', 'B', 'C'] -%}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{img/gen/reactions_{{ p }}.png}
+    \caption{Реакции в точке ${{ p }}$}
+    \label{fig:reactions_{{ p }}}
+\end{figure}
+{% endfor %}
+
+\subsubsection{Моменты}
+
+В условиях квазистатики моменты в шарнирах $B$ и $C$ равны $0$. В точке $A$ существует приводной
+момент $\vec{M_A}$, передаваемый от двигателя насоса через ось. Опишем этот момент:
+\begin{equation}
+    \vec{M_A(\phi)} + \vec{r}_{AB} \times \vec{Z_B} = 0
+    \label{eq:vec_moment_A}
+\end{equation}
+, где $\vec{r}_{AB} = \left( R\cos{\phi}, R\sin{\phi} \right)$.
+Опишем модуль момента через компоненты векторов:
+\begin{equation}
+    M_A(\phi) =  R\cos{\phi} \cdot F \cdot \tan{\theta} + R\sin{\phi} \cdot F 
+    \label{eq:moment_A}
+\end{equation}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{img/gen/moment_A.png}
+    \caption{Приводной момент в точке $A$}
+    \label{fig:moment_A}
+\end{figure}
+
+\clearpage
+\subsection{Прочностной расчет звеньев}
+В прочностном расчёте далее рассматриваем только:
+\begin{itemize}
+    \item внутренние силовые факторы в плоскости движения механизма (изгибающий момент и продольная сила);
+    \item звенья: кривошип и шатун.
+\end{itemize}
+Силу на поршень считаем постоянной и равной расчётной силе: $F = \textit{const}$
+
+\subsubsection{Опасные положения звеньев}
+Опасное положение звена механизма -- положение, при котором внутренние силовые факторы достигают максимума по модулю.
+Дальнейшие оценки выполняются на основе результатов первичного силового анализа механизма.
+
+\paragraph{Кривошип}
+Кривошип длиной $R$ соединяет вал в точке $A$ с шатуном в точке $B$. В расчётной схеме кривошип моделируется
+консольной балкой длиной $R$ с заделкой в $A$ и сосредоточенной нагрузкой в точке $B$ (реакция со стороны шатуна) --
+то есть балка находится под напряжением на изгиб от момента $M_A$.
+
+Найдем максимум момента $M_A$ через производную:
+{% set d_M = diff('R*F*(sin(phi(t))*(sqrt(L^2 - (R*sin(phi(t)))^2)/L) + cos(phi(t)) * (R*sin(phi(t))/L))', 'phi(t)') -%}
+{% set phi_M_max = solve_for_0(diff(with_var_phi(M_A_val), phi_symb), phi_symb, 0, 2*pi, 0.001) -%}
+{% set M_max = (as_fun('phi', with_var_phi(M_A_val))(phi_M_max)) -%}
+\begin{align*}
+    & \frac{dM_A(\phi)}{d\phi} = {{ phi_print(simplify(d_M)) }} = 0 \\
+    & \phi \approx {{ phi_M_max | round(4) }}
+    + 2n\pi\footnotemark, n \in \mathbf{Z}
+\end{align*}
+
+Максимальный момент в точке $A$: $M_{A_{p_{max}}} = {{ M_max | round(4) }}$;
+Таким образом, опасное положение кривошипа -- при $\phi = {{ phi_M_max | round(4) }}$.
+
+\vfill
+\footnotetext{Решение было получено с помощью компьютерной программы с шагом 0.001}
+
+\paragraph{Шатун}
+Шатун соединяет точки $B$ и $C$ и в расчётной схеме рассматривается как двухсиловое звено:
+силы в шарнирах $B$ и $C$ коллинеарны и направлены вдоль оси шатуна. В рамках принятой плоской модели:
+\begin{itemize}
+    \item в шатунe действует только продольная сила $F_{BC}(\phi)$;
+    \item поперечная сила и изгибающий момент пренебрежимо малы.
+\end{itemize}
+
+Из уравнения реакций точки $C$ (ур-е \ref{eq:reactions_C}) имеем:
+$\left|Z_C\right| = \sqrt{F^2 + F^2\tan{\theta}^2}$
+, так как $F = \textit{const}$, то можем описать модуль вектора $\vec{Z_C}$ как функцию по единственной переменной $\theta$.
+Из ур-я \ref{eq:tan_theta} известно, что $\theta$ зависит от фазы $\phi$ -- функция $\left|Z_C\right|(\phi)$
+линейно зависима от компонента $\tan{\theta} = T(\phi) = \frac{R\sin{\phi}}{\sqrt{L^2 - R^2 \cdot \sin{\phi}^2}}$ -- найдем его максимум через производную:
+{% set d_T = with_var_phi(diff('R*sin(phi(t))/sqrt(L^2 - (R*sin(phi(t)))^2)', 'phi(t)')) -%}
+\begin{align*}
+    & \dot{T(\phi)} = {{ phi_print(simplify(d_T)) }} = 0 \Rightarrow \\
+    & \phi = n\frac{\pi}{2}, n \in \mathbf{Z} \\
+    & \dot{T(\phi)}(\frac{\pi}{2}) = {{ as_fun(phi_symb, with_var_phi(tan_theta_val))(pi/2) | round(3) }},
+    \qquad \dot{T(\phi)}(-\frac{\pi}{2}) = {{ as_fun(phi_symb, with_var_phi(tan_theta_val))(-pi/2) | round(3) }} \Rightarrow \\
+    & \phi = \frac{\pi}{2} \text{ -- максимум функции}
+\end{align*}
+Для точки $B$, как описано ранее, реакции имеют такой же модуль, но обратное направление -- точка максимума совпадает.
+
+{% set F_BC_max = as_fun('phi', with_var_phi(F_BC_val))(pi/2) -%}
+Найдем предельную силу $\left|F_{BC}\right|$: $F_{BC_{max}} = {{ F_BC_max | round(3) }}$
+-- видно, что она совпадает с максимальными модулями реакций в шарнирах.
+
+Опасное положение шатуна -- при $\phi = \frac{\pi}{2}$
+
+\subsubsection{Опасные сечения}
+Исходя из найденных опасных положений, определяем опасные сечения каждого звена.
+
+\paragraph{Кривошип}
+Модель: однопролётная консольная балка длиной $R$ с заделкой в точке $A$ и приложенной в точке $B$ силой, эквивалентной реакции шатуна. Координата вдоль кривошипа:
+$R \geq s \geq 0$ (т.е. $s=R$ в $А$, $s=0$ в $B$).
+
+Во внутреннем расчёте для выбранного опасного положения $\phi = \frac{pi}{2}$ имеем:
+\begin{align*}
+    & N(s) = Z_{A_{y_{max}}}(s)({{ phi_M_max | round(4) }}) = {{ as_fun('phi', with_var_phi(Z_A_y_val))(phi_M_max) | round(4) }} \text{Н} = \text{const},
+    \text{(продольная сила)} \\
+    & Q(s) = Z_{A_{x_{max}}}(s)({{ phi_M_max | round(4) }}) = {{ as_fun('phi', with_var_phi(Z_A_x_val))(phi_M_max) | round(4) }} \text{Н} = \text{const},
+    \text{(поперечная сила)} \\
+    & M(s) = -M_A({{ phi_M_max | round(4) }})\cdot s,\quad R \geq s \geq 0.
+\end{align*}
+
+Максимальный изгибающий момент возникает у заделки, при $s = R$:
+$M_{\max} = {{ M_max | round(4) }} \text{Н·м}$.
+
+Таким образом, опасным сечением является сечение в заделке в точке $A$.
+\begin{figure}[!httbp]
+    \centering
+    \includegraphics[width=0.6\linewidth]{img/crank_schema.png}
+    \caption{Эпюра кривошипа}
+    \label{fig:crank_schema}
+\end{figure}
+
+\paragraph{Шатун}
+В принятой плоской модели шатун -- двухсиловой стержень:
+\begin{itemize}
+    \item по длине шатуна действует только продольная сила
+        $N_{\text{шат}} = F_{BC_{max}} \approx {{ as_fun('phi', with_var_phi(F_BC_val))(pi/2) | round(2) }}\ \text{Н}$,
+    \item поперечная сила и изгибающий момент в пределах допускаемой точности считаются равными нулю:
+        $Q_{\text{шат}} \approx 0,\quad M_{\text{шат}} \approx 0$.
+\end{itemize}
+
+При такой схеме растягивающее/сжимающее напряжение одинаково во всех сечениях прямого стержня одинакового сечения\dots
+Поэтому в качестве опасного принимаем минимальное по площади рабочее сечение шатуна (для прямого стержня постоянного сечения — сечение посередине длины):
+
+Опасное сечение шатуна — сечение наименьшей площади. Принимаем середину звена.
+\begin{figure}[!httbp]
+    \centering
+    \includegraphics[width=0.6\linewidth]{img/rod_schema.png}
+    \caption{Эпюра шатуна}
+    \label{fig:rod_schema}
+\end{figure}
+
+\clearpage
+\subsection{Подбор материала}
+%Материалы (Заведомо задаём сечения, вычисляем допустимое напряжение и под него подбирает материал)
+
+Дальнейший подбор материала будет выполняться по совместному действию:
+Для кривошипа — изгибающего момента $M_{A_{p_{max}}} ={{ M_max }}$ и продольной силы $N={{ as_fun('phi', with_var_phi(Z_A_y_val))(phi_M_max) | round(2) }} \  Н$;
+Для шатуна — продольной силы $F_{BC_{max} }={{ as_fun('phi', with_var_phi(F_BC_val))(pi/2) | round(2) }} \ Н$.
+
+$\sigma_{N}=\frac{N_{i}}{A_r}$
+$\sigma_{M}=\frac{M_{i-\max}}{W}$
+
+Как сечение для ползуна возьмем круг диаметром $d = 19.05 \text{ мм } = 0.01905$ м;
+\begin{align*}
+    & A_p = \frac{\pi \cdot d^2}{4} = {{ (with_d(A_p_val) * 1e+6) | round(3) }} \text{ мм}^2 \\
+    & W_p = \frac{\pi \cdot d^3}{32} = {{ (with_d(W_p_val) * 1e+9) | round(3) }} \text{ мм}^3
+\end{align*}
+
+Как сечение для кривошипа и шатуна возьмём квадрат шириной $d_r = 5 \text{ мм }=0.005$ м.
+\begin{align*}
+    & A_r = d_r^2 = {{ (with_d(A_r_val) * 1e+6) | round(3) }} \text{ мм}^2 \\
+    & W_r = \frac{d_r^3}{6} = {{ (with_d(W_r_val) * 1e+9) | round(3) }} \text{ мм}^3
+\end{align*}
+
+Тогда:
+{% set sN_crank = as_fun('phi', with_var_phi(sigma_N_crank_val))(phi_M_max) -%}
+{% set sM_crank = as_fun('phi', with_var_phi(sigma_M_crank_val))(phi_M_max) -%}
+{% set s_crank = sN_crank + sM_crank -%}
+{% set sN_rod = as_fun('phi', with_var_phi(sigma_N_rod_val))(pi/2) -%}
+\begin{itemize}
+    \item Кривошип: 
+        \begin{align*}
+            & \sigma_{N_c} \approx {{ (sN_crank * 10e-6) | round(3) }}\text{ МПа}, \\
+            & \sigma_{M_c} \approx {{ (sM_crank * 10e-6) | round(3) }}\text{ МПа}, \\
+            & \sigma_{c} \approx \sigma_{N_c} + \sigma_{M_c} \approx {{ (s_crank * 10e-6) | round(3) }} \text{ МПа}.
+        \end{align*}
+    \item Шатун:
+        $\sigma_{шт} \approx {{ (sN_rod * 10e-6) | round(3) }} \text{ МПа}.$
+\end{itemize}
+
+Наибольшее напряжение: $\sigma_{\max}={{ (10e-6*s_crank) | round(2) }}$.
+
+%%Возьмём условие: $\sigma_{\max} < [\sigma]$, $[\sigma]=\frac{\sigma_{T}}{n_{запаса}}$%%
+$\sigma_{T}$ — предел текучести материала.
+$n_{\text{запаса}}=2.2$ — коэффициент запаса. 
+$\sigma_{T}>{{ (10e-6*s_crank) | round(2) }} \text{ МПа}$, с учётом коэффициента запаса: $[\sigma]={{ (10e-6*s_crank * 2.2) | round(2) }} \text{ МПа}$
+
+TODO
+%%Сигма допускаемая само по себе условие, и не может задаваться условием. И оно всегда имеет вид: Сигма действующая меньше сигмы допускамой.%%
+Таким образом, подходит "\textit{Сталь 40 ГОСТ 1050-2013}" со средним пределом текучести $\sigma_{m} \approx 335$ МПа, что покрывает
+условие прочности с небольшим запасом.
+
+\clearpage
+\subsection{Уточненный силовой анализ с учётом сил инерции}
+При уточнённом силовом расчёте учитывается влияние инерции подвижных звеньев. Расчёт выполняется по методу Д’Аламбера: к каждому звену прикладываются силы инерции, и далее составляются уравнения равновесия как для статически нагруженной системы.
+
+Рассматриваются три подвижных звена механизма:
+\begin{itemize}
+    \item звено 1 — кривошип $AB$ (масса $m_1$, центр масс в точке $E$),
+    \item звено 2 — шатун $BC$ (масса $m_2$, центр масс в точке $F$),
+    \item звено 3 — ползун с поршнем (масса $m_3$, центр масс в точке $C$).
+\end{itemize}
+
+Принятые исходные данные из предыдущих разделов:
+\begin{itemize}
+    \item диаметр «приведённого» стержня звеньев: $d={{ (1e+3 * with_d(symb('d'))) | round(2) }}\ \text{мм}$,
+        \begin{itemize}
+            \item площадь поршня $A_p =\dfrac{\pi d^2}{4}={{ (with_d(A_p_val) * 1e+4) | round(4) }}\cdot10^{-4}\ \text{м}^2$,
+            \item площадь стержня $A_r =d^2={{ (with_d(A_r_val) * 1e+4) | round(4) }}\cdot10^{-4}\ \text{м}^2$;
+        \end{itemize}
+    \item геометрия механизма: $R={{ ceil(1e+3 * with_d(R_val)) | int }}\ \text{мм}$,
+        $S=2R={{ ceil(1e+3 * with_d(S_val)) | int }}\ \text{мм}$,
+        $L=3R={{ ceil(1e+3 * with_d(L_val)) | int }}\ \text{мм}$;
+    \item частота вращения $n_{omega}={{ n_omega * 60 }}\ \text{об/мин}={{ n_omega }}\ \text{с}^{-1}$,
+        угловая скорость $\omega=2\pi n={{ omega | round(2) }}\ \text{рад/с}$ (постоянна);
+    \item давление $P=\rho_\ell gH={{ (P_val * 1e-6) | round(6) }}\ \text{МПа}$,
+        сила давления на поршень $F=P \cdot A={{ with_d(F_val) | round(2) }}\ \text{Н}$.
+\end{itemize}
+
+\subsubsection{Массы звеньев}
+Материал звеньев: \textit{алюминий 1350-O}, плотность: $\rho_{mat} = {{ rho_m }}$
+Массы в первом приближении определяем как массу стержня постоянного прямоугольного сечения:
+$$
+m = \rho_{mat}A\ell.
+$$
+
+Принятые длины для оценки масс:
+\begin{itemize}
+    \item для кривошипа: $A = A_r$, $\ell_1=R$,
+    \item для шатуна: $A = A_r$,$\ell_2=L$,
+    \item для ползуна с поршнем (приведённо): $A = A_p$, $\ell_3=S=2R$.
+\end{itemize}
+
+{% set A_p_mm = A_p_set * 10000 -%}
+{% set A_r_mm = A_r_set * 10000 -%}
+{% set R_mm = ceil(R_set * 1000) -%}
+{% set S_mm = ceil(S_set * 1000) -%}
+{% set L_mm = ceil(L_set * 1000) -%}
+Тогда:
+\begin{align*}
+    & m_1=\rho_m A R={{ rho_m }} \cdot {{ A_r_mm | round(4) }}\cdot10^{-4}\cdot {{R_mm}}\cdot 10^{-3}
+    ={{ (with_d(m_1_val) * 1e+2) | round(3) }}\cdot 10^{-2}\ \text{кг}, \\
+    & m_2=\rho_m A L={{ rho_m }} \cdot {{ A_r_mm | round(4) }}\cdot10^{-4}\cdot {{L_mm}}\cdot 10^{-3}
+    ={{ (with_d(m_2_val) * 1e+2) | round(3) }}\cdot 10^{-2}\ \text{кг}, \\
+    & m_3=\rho_m A S={{ rho_m }} \cdot {{ A_p_mm | round(4) }}\cdot10^{-4}\cdot {{S_mm}}\cdot 10^{-3}
+    ={{ (with_d(m_3_val) * 1e+2) | round(3) }}\cdot 10^{-2}\ \text{кг}.
+\end{align*}
+
+\subsubsection{Силы инерции звеньев (метод Д'Аламбера)}
+Силы инерции звена:
+\begin{equation}
+    \vec{F}^{\,\text{ин}}_i(\phi) = -m_i\,\vec{a}_{G_i}(\phi).
+    \label{eq:inertia_force}
+\end{equation}
+
+\paragraph{Кривошип (в точке $E$)}
+Из ур-я \ref{eq:inertia_force}:
+\begin{align*}
+    & \vec{F}^{\,\text{ин}}_{1}(\phi)= -m_1
+    \begin{pmatrix}\ddot{x}_E\\ \ddot{y}_E
+    \end{pmatrix}
+    = m_1\frac{R\omega^{2}}{2}
+    \begin{pmatrix}
+        \cos\phi\\ \sin\phi
+    \end{pmatrix}. \\
+    & \left|\vec{F}^{\,\text{ин}}_{1}\right|_{\max}=m_1\dfrac{R\omega^2}{2}=
+    {{ (as_fun('phi', subs(with_var_phi(I_1_val), symb('omega'), omega))(0)) | round(4) }}\ \text{Н}.
+\end{align*}
+
+\paragraph{Шатун (в точке $F$)}
+$$
+F^{\,\text{ин}}_{2x}(\phi)=-m_2\ddot{x}_F(\phi),\qquad
+F^{\,\text{ин}}_{2y}(\phi)=-m_2\ddot{y}_F(\phi).
+$$
+
+\paragraph{Ползун (в точке $C$)}
+$$
+F^{\,\text{ин}}_{3x}(\phi)=-m_3\ddot{x}_C(\phi),\qquad
+F^{\,\text{ин}}_{3y}(\phi)=0.
+$$
+
+{% set I_3x_0 = af(I_3x_val)(0) -%}
+{% set I_2x_max = af(I_2x_val)(0) -%}
+{% set I_2y_max = af(I_2y_val)(pi/2) -%}
+{% set I_1_max = af(I_1_val)(0) -%}
+{% set d_F_3 = (-F_val - I_3x_0) -%}
+Оценка порядка величин:
+\begin{itemize}
+    \item $|F^{\,\text{ин}}_{3x}|_{\max}\approx {{ abs(I_3x_0) | round(3) }} \ \text{Н}$,
+    \item $|F^{\,\text{ин}}_{2x}|_{\max}\approx {{ abs(I_2x_max) | round(3) }} \
+        \text{Н}$, $|F^{\,\text{ин}}_{2y}|_{\max}\approx {{ abs(I_2y_max) | round(3) }} \ \text{Н}$,
+\end{itemize}
+, что меньше основной силовой нагрузки $F={{ F_val | round(3) }}\ \text{Н}$ (порядка $0.1\ldots1.5\%$).
+
+Инерционные моменты $M_i^{\text{ин}}=J_i\varepsilon_i$ в первом приближении не учитываются, так как для данного малогабаритного механизма они малы по сравнению с основным приводным моментом. Для оценки: при аппроксимации шатуна стержнем $J_2=m_2L^2/12$ получаем 
+TODO
+$$
+J_2=\frac{m_2L^2}{12}\approx 1.11\cdot10^{-5}\ \text{кг·м}^2,\qquad
+|J_2\varepsilon_2|_{\max}\approx 3.9\cdot 10^{-3}\ \text{Н·м},
+$$
+тогда как характерный момент от давления $M \sim F_pR\approx {{ M_max }}\ \text{Н·м}$, т.е. вклад порядка $0.3\%$.
+
+\clearpage
+\subsubsection{Расчёт с учётом сил инерции}
+Далее записываются уравнения равновесия для каждого звена.
+Ось $x$ направлена по оси цилиндра (направление силы давления $F$ считается положительным по $x$), ось $y$ — вертикально.
+
+\paragraph{Ползун}
+На ползун действуют:
+\begin{itemize}
+    \item сила давления жидкости $F$ по оси $x$,
+    \item реакция шатуна в шарнире $C$: $\vec{Z}_C=(Z_{Cx},Z_{Cy})$,
+    \item реакция направляющей $N$ (по оси $y$),
+    \item сила инерции $\vec{F}^{\,\text{ин}}_3=(F^{\,\text{ин}}_{3x},0)$.
+\end{itemize}
+
+Уравнения равновесия (по методу Д’Аламбера):
+\begin{itemize}
+    \item
+        По оси $x$:
+        \begin{align*}
+        &\sum F_x=0:\qquad Z_{C_x}+F+F^{\,\text{ин}}_{3x}(\phi)=0, \\
+        & Z_{C_x}(\phi)=-F_p+m_3\ddot{x}_C(\phi).
+    \end{align*}
+    \item
+        По оси $y$:
+        \begin{align*}
+            & \sum F_y=0:\qquad Z_{C_y}+N=0 \;\Rightarrow\; Z_{C_y}(\phi)=-N(\phi).
+    \end{align*}
+\end{itemize}
+при $\phi=0$ получаем $\ddot{x}_C \approx {{ I_3x_0 | round(3) }} \ \text{м/с}^2$, 
+$m_3\ddot{x}_C\approx {{ I_3x_0 | round(3) }} \ \text{Н}$ и $Z_{C_x}
+\approx {{ d_F_3 | round(3) }} \ \text{Н}$ (изменение около ${{ (1e+2 * I_3x_0 / d_F_3) | round(2) }}\%$).
+
+\paragraph{Шатун}
+
+На шатун действуют:
+\begin{itemize}
+    \item реакции в шарнирах $B$ и $C$: $\vec{Z}_B=(Z_{B_x}, Z_{Z_y})$, $\vec{Z}_C=(Z_{C_x},Z_{C_y})$,
+    \item сила инерции в центре масс $F$: $\vec{F}^{\,\text{ин}}_2=(F^{\,\text{ин}}_{2x},F^{\,\text{ин}}_{2y})$.
+\end{itemize}
+
+Уравнения равновесия:
+\begin{itemize}
+    \item
+        По оси $x$:
+        \begin{align*}
+            & \sum F_x=0:\qquad Z_{B_x}+Z_{C_x}+F^{\,\text{ин}}_{2x}(\phi)=0,
+        \end{align*}
+    \item
+        По оси $y$:
+        \begin{align*}
+            & \sum F_y=0:\qquad R_{By}+R_{Cy}+F^{\,\text{ин}}_{2y}(\phi)=0.
+        \end{align*}
+\end{itemize}
+Отсюда:
+\begin{align*}
+    & Z_{B_x}(\phi)=-Z_{C_x}(\phi)-F^{\,\text{ин}}_{2x}(\phi),\\
+    & Z_{B_y}(\phi)=-Z_{C_y}(\phi)-F^{\,\text{ин}}_{2y}(\phi)
+    = N(\phi)-F^{\,\text{ин}}_{2y}(\phi).
+\end{align*}
+
+Таким образом, из-за инерции шатун перестаёт быть строго двухсиловым (появляется третья сила в центре масс).
+
+\paragraph{Кривошип и приводной момент}
+На кривошип действуют:
+\begin{itemize}
+    \item реакции опоры в точке $A$: $\vec{Z_A}=(Z_{A_x}, Z_{A_y})$,
+    \item реакции шатуна в точке $B$: $\vec{Z_B}_B=(Z_{Bx},Z_{By})$,
+    \item сила инерции кривошипа в точке $E$: $\vec{F}^{\,\text{ин}}_1$,
+    \item приводной момент $M_A(\phi)$ на валу.
+\end{itemize}
+
+Координаты точек:
+$$
+x_B={{ phi_print(x_B) }},\quad y_B={{ phi_print(y_B) }},\qquad
+x_E={{ phi_print(x_E) }},\quad y_E={{ phi_print(y_E) }}
+$$
+
+Уравнения равновесия по силам:
+\begin{align*}
+    \sum F_x=0:\qquad Z_{A_x}+Z_{B_x}+F^{\,\text{ин}}_{1x}(\phi)=0,\\
+    \sum F_y=0:\qquad Z_{A_y}+Z_{B_y}+F^{\,\text{ин}}_{1y}(\phi)=0.
+\end{align*}
+
+Моментное уравнение относительно точки $A$:
+$$
+\sum M_A^z=0:\qquad
+M_A(\phi) + (x_B Z_{B_y}-y_B Z_{Bx}) + (x_E F^{\,\text{ин}}_{1y}-y_E F^{\,\text{ин}}_{1x})=0.
+$$
+Так как при постоянной $\omega$ ускорение точки $E$ направлено радиально, сила $\vec{F}^{\,\text{ин}}_1$ коллинеарна $\vec{AE}$,
+следовательно её момент относительно $A$ равен нулю:
+$$
+x_E F^{\,\text{ин}}_{1y}-y_E F^{\,\text{ин}}_{1x}=0.
+$$
+Итоговое выражение для приводного момента:
+$$
+M_A(\phi)=-(x_B Z_{B_y}-y_B Z_{B_x})
+=-Z\left(\cos\phi\;Z_{B_y}(\phi)-\sin\phi\;Z_{B_x}(\phi)\right.
+$$
+Поскольку $R_{Bx}(\phi)$ и $R_{By}(\phi)$ содержат инерционные слагаемые звеньев 2 и 3, приводной момент удобно представлять как сумму:
+$$
+M_A(\phi)=M_{A,\ \text{квазистат}}(\phi)+M_{A,\ \text{инерц}}(\phi),
+$$
+где $M_{A,\ \text{квазистат}}(\phi)$ -- результат первичного силового анализа (без учёта масс), а $M_{A,\ \text{инерц}}(\phi)$ — добавка от $m_2, m_3$ через $F^{\,\text{ин}}_{2}$ и $F^{\,\text{ин}}_{3}$.
+Для трёх цилиндров, работающих параллельно со сдвигом фаз $120^\circ$, суммарный приводной момент на валу определяется суперпозицией:
+$$
+M_{\Sigma}(\phi)=\sum_{k=0}^{2} M_A\!\left(\phi+\frac{2\pi k}{3}\right).
+$$
+
+При $m_2,m_3\to 0$ или $\omega\to 0$ инерционные слагаемые исчезают, и уточнённый силовой расчёт переходит в квазистатический.
+
+\clearpage
+\section{Проверка результатов вычислений}
+Цель — подтвердить, что уточнение силового расчёта (учёт инерции) \textit{не выводит} расчётные зависимости
+$M_A(\phi)$, $Z_A(\phi)$, $Z_C(\phi)$ за пределы, покрываемые коэффициентом запаса: $n_{\min}=2.2$
+
+\subsection{Оценка максимальных приращений от инерции}
+
+{% set mI_3x_max = abs_max(I_3x_val) -%}
+{% set mI_2x_max = abs_max(I_2x_val) -%}
+{% set mI_2y_max = abs_max(I_2y_val) -%}
+{% set mI_1x_max = abs_max(I_1x_val) -%}
+{% set mI_1y_max = abs_max(I_1y_val) -%}
+{% set mI_1_max = abs_max(I_1_val) -%}
+Из уточнённого анализа (оценки максимумов инерционных добавок):
+$$
+|m_3\ddot x_C|_{\max}\approx {{ (mI_3x_max) | round(3) }}\ \text{Н},\quad
+|F^{\text{ин}}_{2x}|_{\max}\approx {{ (mI_2x_max) | round(3) }}\ \text{Н},\quad
+|F^{\text{ин}}_{2y}|_{\max}\approx {{ (mI_2y_max) | round(3) }}\ \text{Н},
+$$
+$$
+|F^{\text{ин}}_{1}|_{\max}\approx {{ (mI_1_max) | round(3) }}\ \text{Н},\quad
+|J_2\varepsilon_2|_{\max}\approx 3.9\cdot 10^{-3}\ \text{Н·м}.
+$$
+
+{% set DZ_Cy = (mI_1_max + mI_2y_max) -%}
+{% set DZ_C = sqrt(mI_3x_max**2 + DZ_Cy**2) -%}
+{% set DZ_Ax = (mI_1x_max + mI_2x_max + mI_3x_max)-%}
+{% set DZ_A = sqrt(DZ_Ax**2 + DZ_Cy**2) -%}
+{% set DM_A = R_val * (mI_2x_max + mI_3x_max + mI_2y_max ) -%}
+Тогда, по сумме модулей:
+\begin{itemize}
+    \item Для реакции в шарнире (C):
+        $$
+        \Delta Z_{C_{x_{max}}}=|m_3\ddot x_C|_{max}\approx {{ mI_3x_max | round(3) }} \ \text{Н},
+        $$
+        $$
+        \Delta Z_{C_{y_{max}}}\lesssim |F^{\text{ин}}_{2y}|_{\max}+|F^{\text{ин}}_{1y}|_{\max}
+        \le {{ mI_2y_max | round(3) }} + {{ mI_1_max | round(3) }} = {{ DZ_Cy | round(3) }} \ \text{Н}.
+        $$
+        Отсюда оценка для модуля:
+        $$
+        \Delta Z_{C_{max}}\lesssim \sqrt{
+            {{ mI_3x_max | round(3) }}^2 + {{ DZ_Cy | round(3) }}^2
+        }={{ DZ_C | round(3) }}\ \text{Н}.
+        $$
+    \item Для реакции в опоре (A):
+        $$
+        \Delta Z_{A_{x_{max}}}\le |m_3\ddot x_C|_{\max}+|F^{\text{ин}}_{2x}|_{\max}+|F^{\text{ин}}_{1x}|_{\max}
+        \le {{ mI_3x_max | round(3) }} + {{ mI_2x_max | round(3) }} = {{ mI_1x_max | round(3) }} = {{ DZ_Ax | round(3) }} \ \text{Н}.
+        $$
+        $$
+        \Delta Z_{A_{y_{max}}}\le |F^{\text{ин}}_{2y}|_{\max}+|F^{\text{ин}}_{1y}|_{\max}
+        \le {{ DZ_Cy | round(3) }}\ \text{Н},
+        $$
+        $$
+        \Delta Z_{A_{max}} \lesssim \sqrt{ {{DZ_Ax | round(3)}}^2 + {{ DZ_Cy | round(3)}}^2} = {{ DZ_A | round(3) }}\ \text{Н}.
+        $$
+    \item Для приводного момента ($M_A$):
+        $$
+        \Delta M_{A,\max}\lesssim
+        R\Big(|F^{\text{ин}}_{2x}|_{\max}+|m_3\ddot x_C|_{\max}+|F^{\text{ин}}_{2y}|_{\max}\Big)+|J_2\varepsilon_2|_{\max},
+        $$
+        $$
+        \Delta M_{A,\max}\lesssim {{ R_val | round(3) }}
+        \cdot ({{ mI_2x_max | round(3) }} + {{ mI_3x_max | round(3) }}+ {{ mI_2y_max | round(3) }}) %0.013\cdot(1.31+1.00+0.56)+0.0039
+        \approx {{ DM_A | round(3) }}\ \text{Н·м}.
+        $$
+\end{itemize}
+
+\subsubsection{Численное сравнение и критерий по запасу}
+
+Вводим коэффициенты изменения максимумов:  
+$$
+k_M=\frac{M_{A_{max}}^{(\text{ин})}}{M_{A_{max}}^{(0)}},\quad  
+k_{Z_A}=\frac{Z_{A_{max}}^{(\text{ин})}}{Z_{A_{max}}^{(0)}},\quad  
+k_{Z_C}=\frac{Z_{C_{max}}^{(\text{ин})}}{Z_{C_{max}}^{(0)}}.  
+$$
+
+{% set k_M = (M_max + DM_A)/M_max -%}
+{% set k_Z_A = (F_BC_max + DZ_A)/F_BC_max -%}
+{% set k_Z_C = (F_BC_max + DZ_C)/F_BC_max -%}
+Тогда по полученным оценкам:
+\begin{align*}
+    & k_M\lesssim \frac{ {{M_max|round(3)}} + {{DM_A|round(3)}} }{ {{M_max|round(3)}} }={{k_M | round(3)}}.\\
+    & k_{Z_A}\lesssim \frac{ {{ F_BC_max | round(3) }} + {{ DZ_A | round(3) }} }{ {{F_BC_max | round(3) }} }
+    = {{ k_Z_A | round(3) }}.\\
+    & k_{Z_C}\lesssim \frac{ {{ F_BC_max | round(3) }} + {{ DZ_C | round(3) }} }{ {{F_BC_max | round(3) }} }
+    = {{ k_Z_C | round(3) }}.\\
+\end{align*}
+
+Таким образом, $k_{max} \approx 1.073$, что меньше чем $n_{\text{запаса}}$
+
+\subsubsection{Вывод}
+Уточнение силового расчёта с учётом сил инерции изменяет $M_A(\phi)$, $R_A(\phi)$, $R_C(\phi)$
+\textit{не более чем на \sim $7.3\%$} (в консервативной оценке), что многократно меньше принятого
+коэффициента запаса $n_{запаса}=2.2 = 220\%$. Следовательно, результаты первичного (квазистатического)
+силового анализа пригодны для дальнейшего прочностного расчёта и обоснованы с учётом запаса.
+
+\clearpage
+\section{Конструкторская стадия}
+Получив все необходимые данные и проведя расчёты, которые подтверждают их пригодность для конструирования полноценной модели-прототипа механизма.  
+
+\subsection{Первичное моделирование прототипа}
+Для составления представления о технических аспектах моделирования была создана первичная модель прототип,
+которая не учитывала сборку и производство, только отражала механизм работы. 
+
+Для обеспечения параллельной установки цилиндров и связанности их фаз будем использовать дисковый коленвал в качестве кривошипа.
+
+TODO: image is missing (a lot)
+
+\subsection{Базовая модель прототипа}
+Результатом разработки первичной модели стало обнаружения различных критических особенностей,
+которые были учтённые при составлении базовой модели прототипа. 
+
+Базовая модель прототипа разработана с учётом механических и технических особенностей механизма:
+крепёж и разборность механизма, перенос оси ползуна, переработка соединения шатуна и ползуна, переработка общего коленвала в сборный дисковый вал.
+
+Следует заметить, что, в силу ограниченности ресурсов, модель \textit{представлена для печати на 3Д-принтере},
+производственный процесс, необходимый для создания полноценного изделия из выбранного материала, нам недоступен.
+
+TODO: image missing
+
+\subsection{Расчёт методом конечных элементов}
+В рамках поставленной задачи необходимо провести расчёт звеньев механизма методом конечных элементов, чтобы рассчитать нагрузку и модифицировать звенья для укрепления слабых точек. 
+
+Задача расчёта добиться состояния механизма в котором максимальная нагрузка не будет
+превышать предел текучести материала “Сталь 40 ГОСТ 1050-2013” $\sigma_m \approx 335\ МПа$
+
+Далее представлены итоге МКЭ для каждого из звеньев, а также модификация звеньев если это было необходимо:
+
+\clearpage
+\subsubsection{Кривошип (вал)}
+TODO: image missing (a lot)
+
+\clearpage
+\subsubsection{Шатун}
+TODO: image missing (a lot)
+
+\clearpage
+\subsubsection{Палец крепления ползуна}
+TODO: image missing (a lot)
+
+\clearpage
+\subsubsection{Ползун}
+TODO: image missing (a lot)
+
+\clearpage
+\section{Заключение}
+
+В ходе выполнения проекта разработан и обоснован прототип переносного поршневого насоса с электрическим приводом на базе кривошипно-ползунного механизма, предназначенного для подъёма пресной проточной воды при обеспечении расчётного напора до 30 м.
+
+\subsection{Поэтапные итоги}
+\begin{enumerate}
+    \item Выполнено формирование требований к изделию и условий эксплуатации:
+        определены показатели мобильности (переносное исполнение, ограничение габаритов и массы, требования к центровке),
+        а также требования безопасности (защита движущихся элементов, требования к корпусу и электроприводу IP44).
+    \item Проведён расчёт исходных гидравлических параметров: по заданным $Q$, $\rho$, $H$ определено давление $P\approx0.32\text{ МПа}$ и
+        полезная мощность $N_{\text{used}}\approx {{N_used_val}} \text{ Вт}$; с учётом суммарного КПД $\eta_{\Sigma}={{eta_Sigma}}$
+        обоснована требуемая мощность электропривода порядка 54 Вт.
+    \item Рассмотрена неравномерность подачи поршневого насоса и выбран способ её снижения:
+        применена многократность — три цилиндра параллельно со сдвигом фаз $120^\circ$, что по расчётной оценке существенно
+        уменьшает пульсацию расхода по сравнению с одиночным цилиндром.
+    \item Выполнены метрический синтез и кинематический анализ кривошипно-ползунного механизма:
+        получены уравнения движения характерных точек, определены скорости и ускорения, что обеспечило исходную базу для силовых расчётов.
+    \item Проведён первичный (квазистатический) силовой анализ: получены зависимости приводного момента $M_A(\phi)$
+        и реакций в опоре $Z_A(\phi)$ и шарнире $Z_C(\phi)$, выявлены интервалы, в которых из-за режима простого действия
+        часть нагрузки воспринимается одним цилиндром.
+    \item Выполнен прочностной расчёт звеньев в плоской постановке (кривошип и шатун): определены опасные положения и опасные сечения
+        (для кривошипа — у заделки в точке $A$, для шатуна — минимальное рабочее сечение), рассчитаны напряжения,
+        показано выполнение условия прочности при выборе материала "Сталь 40 ГОСТ 1050-2013" с существенным запасом.
+    \item Проведён уточнённый силовой анализ с учётом сил инерции по методу Д’Аламбера: оценены массы звеньев и инерционные составляющие,
+        установлено, что их вклад в основные силовые факторы составляет порядка $0.1\ldots1.5\%$, а в приводной момент — порядка нескольких процентов.
+    \item Выполнена проверка применимости квазистатического расчёта: консервативно показано,
+        что изменение максимумов $M_A$, $Z_A$, $Z_C$ при учёте инерции не превышает $\sim 7.3\%$,
+        что существенно меньше принятого коэффициента запаса $n_{\min}=2.2$; следовательно, принятые расчётные зависимости
+        являются обоснованными для дальнейшего проектирования.
+    \item На конструкторской стадии разработаны 3D-модели механизма (первичная и базовая),
+        выполнена корректировка компоновки (дисковый/сборный коленвал, переработка узлов разборности и соединений),
+        а также проведён МКЭ-анализ звеньев с последующей модификацией геометрии для снижения концентраций напряжений
+        (скругления и сглаживания кромок в наиболее нагруженных зонах).
+    \item На технологической стадии обосновано изготовление прототипов методом 3D-печати из PLA,
+        произведена сборка с применением стандартного крепежа (М6×20) и технологических замен для элементов,
+        затруднительных в печати (имитация резьбовых деталей для крышек валов).
+
+\end{enumerate}
+
+\subsection{Итог работы}
+Таким образом, проект завершён получением уточнённой геометрической модели прототипа,
+согласованной с результатами кинематического, силового и прочностного расчётов, а также с результатами МКЭ-оценки.
+Принятые конструктивные и расчётные решения обеспечивают достижение требуемых эксплуатационных показателей
+и создают основу для дальнейшей доводки конструкции и изготовления полнофункционального опытного образца.
+
+\clearpage
 \section{Приложения}
-\begin{figure}[h!]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=\linewidth]{img/washbasin_specs.png}
     \caption{Характеристики умывальника согласно документу СНиП 2.04.01-85*}
     \label{fig:washbasin_specs}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=\linewidth]{img/pump_specs.png}
     \caption{TODO}
