@@ -1,6 +1,5 @@
 #!/bin/python3
 
-from operator import eq
 from jinja2 import Environment, FileSystemLoader
 import sys
 import math
@@ -113,9 +112,11 @@ def equations():
     #M_A = F_BC *(R*sp.cos(phi)*tan_theta + R * sp.sin(phi))
     M_A = F_BC * R * (sp.sin(phi)*cos_theta + sp.cos(phi)*sin_theta)
 
-    sigma_N_crank = Z_A_x / A_r
+    sigma_N_crank = Z_A_y / A_r
+    sigma_Q_crank = Z_A_x / A_r
+    sigma_N_rod = F * tan_theta / A_r
+    sigma_Q_rod = F / A_r
     sigma_M_crank = M_A / W_r
-    sigma_N_rod = F_BC / A_r
 
     rho_m = sp.symbols('rho_m')
     m_1 = rho_m * R * A_r
@@ -141,7 +142,8 @@ def equations():
     I_3 = sp.sqrt(I_3x**2 + I_3y**2)
 
     J_2 = m_2 * L**2 / 12
-    J_2_eps = J_2 / L
+    eps = 1/ L
+    J_2_eps = J_2 * eps
 
     return {'t': t, 'phi': phi,
             'P': P, 'Delta_P': Delta_P,
@@ -166,8 +168,10 @@ def equations():
             'Z_A': Z_A, 'Z_B': Z_B, 'Z_C': Z_C,
             'M_A': M_A, 'F_BC': F_BC,
             'sigma_N_crank': sigma_N_crank,
+            'sigma_Q_crank': sigma_Q_crank,
             'sigma_M_crank': sigma_M_crank,
             'sigma_N_rod': sigma_N_rod,
+            'sigma_Q_rod': sigma_Q_rod,
             'm_1': m_1,
             'm_2': m_2,
             'm_3': m_3,
@@ -245,9 +249,9 @@ if __name__ == "__main__":
     template = env.get_template(sys.argv[1])
     
     ctx = {
-        **constants(),
-        **equations(),
-        **substitutes(constants(), equations()),
+        **consts,
+        **eqs,
+        **subs,
         }
 
     rendered = template.render(

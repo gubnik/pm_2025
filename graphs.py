@@ -10,18 +10,11 @@ import main
 def q_fn(phi: float) -> float:
     return max(0, math.sin(phi))
 
-
 def q_Sigma_fn(phi: float, n: int) -> float:
     return sum(q_fn(phi + (2 * math.pi * k)/n) for k in range(0, n))
 
-
 def q_Norm_fn(phi: float, n: int) -> float:
     return q_Sigma_fn(phi, n) / q_Sigma_fn(n * np.pi / 2, n)
-
-
-def sigma_fn(f: Callable, phi: float, n: int) -> float:
-    return sum(f(phi + (2 * math.pi * k)/n) for k in range(0, n))
-
 
 def plot_to_png(filename: str, f: Callable, test_range: np.ndarray, x_label: str, y_label: str, do_pi_labels: bool = False):
     vals = [f(i) for i in test_range]
@@ -38,10 +31,8 @@ def plot_to_png(filename: str, f: Callable, test_range: np.ndarray, x_label: str
     plt.savefig(filename)
     plt.close()
 
-
 def single_acting_window(phi: float):
     return max(0, phi)
-
 
 def plot_multiple(filename: str, functions: list[Callable], test_range: np.ndarray, x_label: str, y_label: str,
                   do_pi_labels: bool = False,
@@ -117,7 +108,8 @@ if __name__ == "__main__":
                   y_label=f"v_x, скорость по оси y, м/с",
                   do_pi_labels=True)
     plot_multiple(filename=f"img/gen/vel_mod.png",
-                  functions=[lambda phi, v_x_f=v_x_f, v_y_f=v_y_f: math.sqrt(v_x_f(phi)**2 + v_y_f(phi)**2) for v_x_f, v_y_f in zip(v_x_fs, v_y_fs)],
+                  functions=[lambda phi, v_x_f=v_x_f, v_y_f=v_y_f: math.sqrt(v_x_f(phi)**2 + v_y_f(phi)**2)
+                             for v_x_f, v_y_f in zip(v_x_fs, v_y_fs)],
                   legend=[f"Точка {p}" for p in points],
                   test_range=np.arange(0, 2 * np.pi, 0.01),
                   x_label=caption_phi,
@@ -138,7 +130,8 @@ if __name__ == "__main__":
                   y_label=f"a_x, ускорение по оси y, м/с",
                   do_pi_labels=True)
     plot_multiple(filename=f"img/gen/acc_mod.png",
-                  functions=[lambda phi, a_x_f=a_x_f, a_y_f=a_y_f: math.sqrt(a_x_f(phi)**2 + a_y_f(phi)**2) for a_x_f, a_y_f in zip(a_x_fs, a_y_fs)],
+                  functions=[lambda phi, a_x_f=a_x_f, a_y_f=a_y_f: math.sqrt(a_x_f(phi)**2 + a_y_f(phi)**2)
+                             for a_x_f, a_y_f in zip(a_x_fs, a_y_fs)],
                   legend=[f"Точка {p}" for p in points],
                   test_range=np.arange(0, 2 * np.pi, 0.01),
                   x_label=caption_phi,
@@ -153,12 +146,18 @@ if __name__ == "__main__":
                     do_pi_labels=True)
     print(max_in_range(M_A_f, np.arange(0, 2*np.pi, 0.01)))
     for p in ['A', 'B', 'C']:
-        Z_x_f = sp.lambdify(phi_symb, subs[f'Z_{p}_x_val'].xreplace({eqs['phi']: phi_symb, sp.diff(eqs['phi']) : omega,
-                                                                    d: d_val}))
-        Z_y_f = sp.lambdify(phi_symb, subs[f'Z_{p}_y_val'].xreplace({eqs['phi']: phi_symb, sp.diff(eqs['phi']) : omega,
-                                              d: d_val}))
-        Z_f = sp.lambdify(phi_symb, subs[f'Z_{p}_val'].xreplace({eqs['phi']: phi_symb, sp.diff(eqs['phi']) : omega,
-                                                                d: d_val}))
+        Z_x_f = sp.lambdify(phi_symb, subs[f'Z_{p}_x_val'].
+                            xreplace({eqs['phi']: phi_symb,
+                                      sp.diff(eqs['phi']) : omega,
+                                      d: d_val}))
+        Z_y_f = sp.lambdify(phi_symb, subs[f'Z_{p}_y_val'].
+                            xreplace({eqs['phi']: phi_symb,
+                                      sp.diff(eqs['phi']) : omega,
+                                      d: d_val}))
+        Z_f = sp.lambdify(phi_symb, subs[f'Z_{p}_val'].
+                          xreplace({eqs['phi']: phi_symb,
+                                    sp.diff(eqs['phi']) : omega,
+                                    d: d_val}))
         plot_multiple(filename=f"img/gen/reactions_{p}.png",
                       functions=[lambda phi, f=f: f(phi) for f in [Z_x_f, Z_y_f, Z_f]],
                       legend=['OX', 'OY', 'Модуль'],

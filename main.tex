@@ -211,7 +211,7 @@ $$
 N = {{ Q | round(4) }} \cdot {{ H }} \cdot {{ rho }} \cdot {{ g }}
 $$
 $$
-N = {{ N_val | round(4)}}
+N = {{ N_val | round(4)}} \text{ Вт}
 $$
 Для получения мощности двигателя насоса, необходимо учесть КПД, возникающий в реальной конструкции;
 в случае нашего изделия, КПД $\eta_{\Sigma} \in \left[ 60\%, 95\% \right]$. Возьмем нижний порог,
@@ -221,10 +221,10 @@ $\eta_{\Sigma} = 60\%$:
     \label{eq:pump_force}
 \end{equation}
 $$
-N_{used} = \frac{ {{ N_used_val | round(4) }} }{ {{eta_Sigma | round(2)}} }
+N_{used} = \frac{ {{ N_val | round(4) }} }{ {{eta_Sigma | round(2)}} } \text{ Вт}
 $$
 $$
-N_{used} = {{N_used_val | round(3)}}
+N_{used} = {{N_used_val | round(3)}} \text{ Вт}
 $$
 
 \subsection{Пульсация}
@@ -255,7 +255,7 @@ $$
 {% for i in range (1, 7 + 1, 2) %}
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=\linewidth]{img/gen/pulse_{{ i }}.png}
+    \includegraphics[width=0.6\linewidth]{img/gen/pulse_{{ i }}.png}
     \caption{Графики нормированной пульсации для {{ i }} цилиндра(-ов)}
     \label{fig:pulse_{{ i -}}}
 \end{figure}
@@ -292,11 +292,11 @@ $$
 \subsection{Длины}
 Опишем длины компонентов и силу, с которой должен действовать поршень. Длины можно найти как:
 \begin{align*}
-    & \text{Площадь поршня: } A_p = \frac{Q}{2Rzn\eta_v} = {{latex(A_p)}} \\
-    & \text{Длина плеча привошипа: } R = {{latex(R)}} \\
-    & \text{Путь и длина ползуна: } S = 2 \cdot R = {{latex(S)}} \\
+    & \text{Площадь поршня: } A_p = \frac{Q}{2Rzn\eta_v} = {{latex(simplify(A_p))}} \\
+    & \text{Длина плеча привошипа: } R = {{latex(simplify(R))}} \\
+    & \text{Путь и длина ползуна: } S = 2 \cdot R = {{latex(simplify(S))}} \\
     & \lambda_{len} = \frac{L}{R}, \text{ пусть } \lambda = 3 \\
-    & \text{Длина плеча шатуна: } L = \lambda_{len} \cdot R = {{ latex(L) }} \\
+    & \text{Длина плеча шатуна: } L = \lambda_{len} \cdot R = {{ latex(simplify(L)) }} \\
     % & v_{\text{max}} \approx \omega \cdot R \\
 \end{align*}\footnote{Значение $\lambda = 3$ было выбрано по аналогии с ДВС}
 В случае $d = 25.4$ мм \footnote{сантехнический дюйм} механизм получается слишком коротким и слишком широким -- возьмем $d = \frac{3}{4} \cdot 25.4 = 19.05$ мм.
@@ -314,6 +314,7 @@ $$
     & L = {{ ceil(L_set * 1000) | int }}\text{ мм} \\ 
 \end{align*}
 
+\clearpage
 \subsection{Кинематический анализ}
 Используя длины получить скорости и ускорения 	
 
@@ -600,7 +601,7 @@ $\left|Z_C\right| = \sqrt{F^2 + F^2\tan{\theta}^2}$
 Модель: однопролётная консольная балка длиной $R$ с заделкой в точке $A$ и приложенной в точке $B$ силой, эквивалентной реакции шатуна. Координата вдоль кривошипа:
 $R \geq s \geq 0$ (т.е. $s=R$ в $А$, $s=0$ в $B$).
 
-Во внутреннем расчёте для выбранного опасного положения $\phi = \frac{pi}{2}$ имеем:
+Во внутреннем расчёте для выбранного опасного положения $\phi = {{phi_M_max | round(4)}}$ рад. имеем:
 \begin{align*}
     & N(s) = Z_{A_{y_{max}}}(s)({{ phi_M_max | round(4) }}) = {{ as_fun('phi', with_var_phi(Z_A_y_val))(phi_M_max) | round(4) }} \text{Н} = \text{const},
     \text{(продольная сила)} \\
@@ -609,6 +610,7 @@ $R \geq s \geq 0$ (т.е. $s=R$ в $А$, $s=0$ в $B$).
     & M(s) = -M_A({{ phi_M_max | round(4) }})\cdot s,\quad R \geq s \geq 0.
 \end{align*}
 
+Модуль суммарных реакций в этом положении: $Z_{crank_{max}} = {{ af(F_BC_val)(phi_M_max) }}$
 Максимальный изгибающий момент возникает у заделки, при $s = R$:
 $M_{\max} = {{ M_max | round(4) }} \text{Н·м}$.
 
@@ -642,10 +644,10 @@ $M_{\max} = {{ M_max | round(4) }} \text{Н·м}$.
 
 \clearpage
 \subsection{Подбор материала}
-%Материалы (Заведомо задаём сечения, вычисляем допустимое напряжение и под него подбирает материал)
-
 Дальнейший подбор материала будет выполняться по совместному действию:
-Для кривошипа — изгибающего момента $M_{A_{p_{max}}} ={{ M_max | round(3) }}$ и продольной силы $N={{ as_fun('phi', with_var_phi(Z_A_y_val))(phi_M_max) | round(2) }} \  Н$;
+Для кривошипа — изгибающего момента $M_{A_{p_{max}}} ={{ M_max | round(3) }}$,
+продольной силы $N={{ as_fun('phi', with_var_phi(Z_A_x_val))(phi_M_max) | round(2) }} \  Н$
+и поперечной силы $Q= {{ as_fun('phi', with_var_phi(Z_A_y_val))(phi_M_max) | round(2) }}$;
 Для шатуна — продольной силы $F_{BC_{max} }={{ as_fun('phi', with_var_phi(F_BC_val))(pi/2) | round(2) }} \ Н$.
 
 $\sigma_{N}=\frac{N_{i}}{A_r}$
@@ -664,19 +666,27 @@ $\sigma_{M}=\frac{M_{i-\max}}{W}$
 \end{align*}
 
 Тогда:
+{% set sQ_crank = as_fun('phi', with_var_phi(sigma_Q_crank_val))(phi_M_max) -%}
 {% set sN_crank = as_fun('phi', with_var_phi(sigma_N_crank_val))(phi_M_max) -%}
 {% set sM_crank = as_fun('phi', with_var_phi(sigma_M_crank_val))(phi_M_max) -%}
-{% set s_crank = sN_crank + sM_crank -%}
+{% set s_crank = sN_crank + sM_crank + sQ_crank -%}
 {% set sN_rod = as_fun('phi', with_var_phi(sigma_N_rod_val))(pi/2) -%}
+{% set sQ_rod = as_fun('phi', with_var_phi(sigma_Q_rod_val))(pi/2) -%}
+{% set s_rod = sN_rod + sQ_rod -%}
 \begin{itemize}
     \item Кривошип: 
         \begin{align*}
             & \sigma_{N_c} \approx {{ (sN_crank * 1e-6) | round(3) }}\text{ МПа}, \\
+            & \sigma_{Q_c} \approx {{ (sQ_crank * 1e-6) | round(3) }}\text{ МПа}, \\
             & \sigma_{M_c} \approx {{ (sM_crank * 1e-6) | round(3) }}\text{ МПа}, \\
-            & \sigma_{c} \approx \sigma_{N_c} + \sigma_{M_c} \approx {{ (s_crank * 1e-6) | round(3) }} \text{ МПа}.
+            & \sigma_{c} \approx \sigma_{N_c} + \sigma_{Q_c} + \sigma_{M_c} \approx {{ (s_crank * 1e-6) | round(3) }} \text{ МПа}.
         \end{align*}
     \item Шатун:
-        $\sigma_{шт} \approx {{ (sN_rod * 1e-6) | round(3) }} \text{ МПа}.$
+        \begin{align*}
+            & \sigma_{N_r} \approx {{ (sN_rod * 1e-6) | round(3) }} \text{ МПа}, \\
+            & \sigma_{Q_r} \approx {{ (sQ_rod * 1e-6) | round(3) }} \text{ МПа}, \\
+            & \sigma_{r} \approx {{ (s_rod * 1e-6) | round(3) }} \text{ МПа}, \\
+        \end{align*}
 \end{itemize}
 
 Наибольшее напряжение: $\sigma_{\max}={{ (1e-6*s_crank) | round(2) }}$.
@@ -1031,13 +1041,13 @@ $$
 \subsubsection{Кривошип (вал)}
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=\linewidth]{img/mke/crank_stress.png}
+    \includegraphics[width=0.8\linewidth]{img/mke/crank_stress.png}
     \caption{Напряжения в кривошипа}
     \label{fig:crank_stress}
 \end{figure}
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=\linewidth]{img/mke/crank_shift.png}
+    \includegraphics[width=0.8\linewidth]{img/mke/crank_shift.png}
     \caption{Перемещения в кривошипа}
     \label{fig:crank_shift}
 \end{figure}
@@ -1046,45 +1056,43 @@ $$
 \subsubsection{Шатун}
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=\linewidth]{img/mke/r2p_stress.png}
-    \caption{Напряжения в шатуне}
+    \includegraphics[width=0.8\linewidth]{img/mke/r2p_stress.png}
+    \caption{Напряжения в шатуне со стороны кривошипа}
     \label{fig:r2p_stress}
 \end{figure}
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=\linewidth]{img/mke/r2p_shift.png}
-    \caption{в шатуне}
+    \includegraphics[width=0.8\linewidth]{img/mke/r2p_shift.png}
+    \caption{Перемещения в шатуне со стороны кривошипа}
     \label{fig:r2p_shift}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.8\linewidth]{img/mke/p2r_stress.png}
+    \caption{Напряжения в шатуне со стороны ползуна}
+    \label{fig:p2r_stress}
+\end{figure}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.8\linewidth]{img/mke/p2r_shift.png}
+    \caption{Перемещения в шатуне со стороны ползуна}
+    \label{fig:p2r_shift}
 \end{figure}
 
 \clearpage
 \subsubsection{Палец крепления ползуна}
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=\linewidth]{img/mke/finger_stress.png}
-    \caption{Напряжения в шатуне}
+    \includegraphics[width=0.8\linewidth]{img/mke/finger_stress.png}
+    \caption{Напряжения в пальце}
     \label{fig:finger_stress}
 \end{figure}
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=\linewidth]{img/mke/finger_shift.png}
-    \caption{в шатуне}
+    \includegraphics[width=0.8\linewidth]{img/mke/finger_shift.png}
+    \caption{Перемещения в пальце}
     \label{fig:finger_shift}
-\end{figure}
-
-\clearpage
-\subsubsection{Ползун}
-\begin{figure}[!ht]
-    \centering
-    \includegraphics[width=\linewidth]{img/mke/p2r_stress.png}
-    \caption{Напряжения в шатуне}
-    \label{fig:p2r_stress}
-\end{figure}
-\begin{figure}[!ht]
-    \centering
-    \includegraphics[width=\linewidth]{img/mke/p2r_shift.png}
-    \caption{в шатуне}
-    \label{fig:p2r_shift}
 \end{figure}
 
 \clearpage
