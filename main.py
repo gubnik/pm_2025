@@ -21,7 +21,7 @@ def max_in_range(f: Callable, test_range: np.ndarray, **kwargs):
 def constants():
     g = 9.81
     rho = 1050
-    H = 5
+    H = 50
     Q = 1e-4
     lambda_fr = 0.010
     L_pipe = 3
@@ -140,6 +140,9 @@ def equations():
     I_2 = sp.sqrt(I_2x**2 + I_2y**2)
     I_3 = sp.sqrt(I_3x**2 + I_3y**2)
 
+    J_2 = m_2 * L**2 / 12
+    J_2_eps = J_2 / L
+
     return {'t': t, 'phi': phi,
             'P': P, 'Delta_P': Delta_P,
             'x_A': x_A, 'y_A': y_A,
@@ -171,6 +174,7 @@ def equations():
             'I_1x': I_1x, 'I_1y': I_1y, 'I_1': I_1,
             'I_2x': I_2x, 'I_2y': I_2y, 'I_2': I_2,
             'I_3x': I_3x, 'I_3y': I_3y, 'I_3': I_3,
+            'J_2': J_2, 'J_2_eps': J_2_eps,
             **vels, **accs}
 
 def substitutes(consts, eqs):

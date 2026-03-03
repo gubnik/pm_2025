@@ -18,6 +18,8 @@
 \usepackage{unicode-math}
 \usepackage{gensymb}
 \usepackage{mathtools}
+\usepackage{cite}
+\usepackage{listings}
 
 \usepackage{setspace}
 \onehalfspacing
@@ -35,6 +37,24 @@
 \setmainfont{Times New Roman}[size=12pt]
 \setdefaultlanguage{russian}
 \usepackage[utf8]{inputenc}
+\setmonofont{JetBrainsMono Nerd Font}[size=14pt]
+\newfontfamily\cyrillicfonttt{Times New Roman}[Script=Cyrillic,Scale=MatchLowercase]
+
+\lstdefinestyle{python}{
+    language=Python,
+    basicstyle=\footnotesize\ttfamily,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green},
+    stringstyle=\color{red},
+    showstringspaces=false,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    frame=single,
+    breaklines=true,
+    tabsize=4,
+    captionpos=b,
+}
 
 \begin{document}
 \include{gen.titlepage}
@@ -114,10 +134,6 @@
 СНиП 2.04.01-85*(\ref{fig:washbasin_specs})
 
 \clearpage
-\section{Качественные характеристики}
-TODO: ???
-
-\clearpage
 \section{Количественные характеристики}
 Исходя из СНиП 2.04.01-85*(\ref{fig:washbasin_specs}), запишем следующие целевые характеристики:
 \begin{itemize}
@@ -127,8 +143,8 @@ TODO: ???
 
 \subsection{Полезная нагрузка}
 В качестве полезной нагрузки примем сопротивление жидкости (характеризуем ее давлением);
-тогда, рассчитаем полезную нагрузку для подъема воды на расстояние 30 метров
-\footnote{Высота 30 метров была принята для обеспечения запасной мощности насоса.}:
+тогда, рассчитаем полезную нагрузку для подъема воды на расстояние {{H}} метров
+\footnote{Высота {{H}} метров была принята как оптимальная для полевых задача, такие как поставки воды в лагерь из водоема.}:
 \begin{equation}
     P = {{ latex(P) }}
     \label{eq:liquid_pressure}
@@ -629,7 +645,7 @@ $M_{\max} = {{ M_max | round(4) }} \text{Н·м}$.
 %Материалы (Заведомо задаём сечения, вычисляем допустимое напряжение и под него подбирает материал)
 
 Дальнейший подбор материала будет выполняться по совместному действию:
-Для кривошипа — изгибающего момента $M_{A_{p_{max}}} ={{ M_max }}$ и продольной силы $N={{ as_fun('phi', with_var_phi(Z_A_y_val))(phi_M_max) | round(2) }} \  Н$;
+Для кривошипа — изгибающего момента $M_{A_{p_{max}}} ={{ M_max | round(3) }}$ и продольной силы $N={{ as_fun('phi', with_var_phi(Z_A_y_val))(phi_M_max) | round(2) }} \  Н$;
 Для шатуна — продольной силы $F_{BC_{max} }={{ as_fun('phi', with_var_phi(F_BC_val))(pi/2) | round(2) }} \ Н$.
 
 $\sigma_{N}=\frac{N_{i}}{A_r}$
@@ -655,22 +671,21 @@ $\sigma_{M}=\frac{M_{i-\max}}{W}$
 \begin{itemize}
     \item Кривошип: 
         \begin{align*}
-            & \sigma_{N_c} \approx {{ (sN_crank * 10e-6) | round(3) }}\text{ МПа}, \\
-            & \sigma_{M_c} \approx {{ (sM_crank * 10e-6) | round(3) }}\text{ МПа}, \\
-            & \sigma_{c} \approx \sigma_{N_c} + \sigma_{M_c} \approx {{ (s_crank * 10e-6) | round(3) }} \text{ МПа}.
+            & \sigma_{N_c} \approx {{ (sN_crank * 1e-6) | round(3) }}\text{ МПа}, \\
+            & \sigma_{M_c} \approx {{ (sM_crank * 1e-6) | round(3) }}\text{ МПа}, \\
+            & \sigma_{c} \approx \sigma_{N_c} + \sigma_{M_c} \approx {{ (s_crank * 1e-6) | round(3) }} \text{ МПа}.
         \end{align*}
     \item Шатун:
-        $\sigma_{шт} \approx {{ (sN_rod * 10e-6) | round(3) }} \text{ МПа}.$
+        $\sigma_{шт} \approx {{ (sN_rod * 1e-6) | round(3) }} \text{ МПа}.$
 \end{itemize}
 
-Наибольшее напряжение: $\sigma_{\max}={{ (10e-6*s_crank) | round(2) }}$.
+Наибольшее напряжение: $\sigma_{\max}={{ (1e-6*s_crank) | round(2) }}$.
 
 %%Возьмём условие: $\sigma_{\max} < [\sigma]$, $[\sigma]=\frac{\sigma_{T}}{n_{запаса}}$%%
 $\sigma_{T}$ — предел текучести материала.
 $n_{\text{запаса}}=2.2$ — коэффициент запаса. 
-$\sigma_{T}>{{ (10e-6*s_crank) | round(2) }} \text{ МПа}$, с учётом коэффициента запаса: $[\sigma]={{ (10e-6*s_crank * 2.2) | round(2) }} \text{ МПа}$
+$\sigma_{T}>{{ (1e-6*s_crank) | round(2) }} \text{ МПа}$, с учётом коэффициента запаса: $[\sigma]={{ (1e-6*s_crank * 2.2) | round(2) }} \text{ МПа}$
 
-TODO
 %%Сигма допускаемая само по себе условие, и не может задаваться условием. И оно всегда имеет вид: Сигма действующая меньше сигмы допускамой.%%
 Таким образом, подходит "\textit{Сталь 40 ГОСТ 1050-2013}" со средним пределом текучести $\sigma_{m} \approx 335$ МПа, что покрывает
 условие прочности с небольшим запасом.
@@ -777,13 +792,14 @@ $$
 \end{itemize}
 , что меньше основной силовой нагрузки $F={{ F_val | round(3) }}\ \text{Н}$ (порядка $0.1\ldots1.5\%$).
 
-Инерционные моменты $M_i^{\text{ин}}=J_i\varepsilon_i$ в первом приближении не учитываются, так как для данного малогабаритного механизма они малы по сравнению с основным приводным моментом. Для оценки: при аппроксимации шатуна стержнем $J_2=m_2L^2/12$ получаем 
-TODO
+Инерционные моменты $M_i^{\text{ин}}=J_i\varepsilon_i$ в первом приближении не учитываются,
+так как для данного малогабаритного механизма они малы по сравнению с основным приводным моментом.
+Для оценки: при аппроксимации шатуна балкой $J_2=m_2L^2/12$ получаем 
 $$
-J_2=\frac{m_2L^2}{12}\approx 1.11\cdot10^{-5}\ \text{кг·м}^2,\qquad
-|J_2\varepsilon_2|_{\max}\approx 3.9\cdot 10^{-3}\ \text{Н·м},
+J_2=\frac{m_2L^2}{12}\approx {{ (1e+5 * J_2_val) | round(3) }}\cdot 10^{-5}\ \text{кг·м}^2,\qquad
+|J_2\varepsilon_2|_{\max}\approx {{ (1e+3 * J_2_eps_val ) | round(3) }} \cdot 10^{-3}\ \text{Н·м},
 $$
-тогда как характерный момент от давления $M \sim F_pR\approx {{ M_max }}\ \text{Н·м}$, т.е. вклад порядка $0.3\%$.
+тогда как характерный момент от давления $M \sim F_pR\approx {{ M_max | round(3) }}\ \text{Н·м}$, т.е. вклад порядка $0.3\%$.
 
 \clearpage
 \subsubsection{Расчёт с учётом сил инерции}
@@ -916,7 +932,7 @@ $$
 $$
 $$
 |F^{\text{ин}}_{1}|_{\max}\approx {{ (mI_1_max) | round(3) }}\ \text{Н},\quad
-|J_2\varepsilon_2|_{\max}\approx 3.9\cdot 10^{-3}\ \text{Н·м}.
+|J_2\varepsilon_2|_{\max}\approx {{(1e+3 * J_2_eps_val) | round(3)}} \cdot 10^{-3}\ \text{Н·м}.
 $$
 
 {% set DZ_Cy = (mI_1_max + mI_2y_max) -%}
@@ -989,7 +1005,7 @@ $$
 
 \subsubsection{Вывод}
 Уточнение силового расчёта с учётом сил инерции изменяет $M_A(\phi)$, $R_A(\phi)$, $R_C(\phi)$
-\textit{не более чем на \sim $7.3\%$} (в консервативной оценке), что многократно меньше принятого
+\textit{не более чем на $\sim 0.7\%$} (в консервативной оценке), что многократно меньше принятого
 коэффициента запаса $n_{запаса}=2.2 = 220\%$. Следовательно, результаты первичного (квазистатического)
 силового анализа пригодны для дальнейшего прочностного расчёта и обоснованы с учётом запаса.
 
@@ -1003,20 +1019,6 @@ $$
 
 Для обеспечения параллельной установки цилиндров и связанности их фаз будем использовать дисковый коленвал в качестве кривошипа.
 
-TODO: image is missing (a lot)
-
-\subsection{Базовая модель прототипа}
-Результатом разработки первичной модели стало обнаружения различных критических особенностей,
-которые были учтённые при составлении базовой модели прототипа. 
-
-Базовая модель прототипа разработана с учётом механических и технических особенностей механизма:
-крепёж и разборность механизма, перенос оси ползуна, переработка соединения шатуна и ползуна, переработка общего коленвала в сборный дисковый вал.
-
-Следует заметить, что, в силу ограниченности ресурсов, модель \textit{представлена для печати на 3Д-принтере},
-производственный процесс, необходимый для создания полноценного изделия из выбранного материала, нам недоступен.
-
-TODO: image missing
-
 \subsection{Расчёт методом конечных элементов}
 В рамках поставленной задачи необходимо провести расчёт звеньев механизма методом конечных элементов, чтобы рассчитать нагрузку и модифицировать звенья для укрепления слабых точек. 
 
@@ -1027,33 +1029,75 @@ TODO: image missing
 
 \clearpage
 \subsubsection{Кривошип (вал)}
-TODO: image missing (a lot)
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{img/mke/crank_stress.png}
+    \caption{Напряжения в кривошипа}
+    \label{fig:crank_stress}
+\end{figure}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{img/mke/crank_shift.png}
+    \caption{Перемещения в кривошипа}
+    \label{fig:crank_shift}
+\end{figure}
 
 \clearpage
 \subsubsection{Шатун}
-TODO: image missing (a lot)
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{img/mke/r2p_stress.png}
+    \caption{Напряжения в шатуне}
+    \label{fig:r2p_stress}
+\end{figure}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{img/mke/r2p_shift.png}
+    \caption{в шатуне}
+    \label{fig:r2p_shift}
+\end{figure}
 
 \clearpage
 \subsubsection{Палец крепления ползуна}
-TODO: image missing (a lot)
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{img/mke/finger_stress.png}
+    \caption{Напряжения в шатуне}
+    \label{fig:finger_stress}
+\end{figure}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{img/mke/finger_shift.png}
+    \caption{в шатуне}
+    \label{fig:finger_shift}
+\end{figure}
 
 \clearpage
 \subsubsection{Ползун}
-TODO: image missing (a lot)
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{img/mke/p2r_stress.png}
+    \caption{Напряжения в шатуне}
+    \label{fig:p2r_stress}
+\end{figure}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{img/mke/p2r_shift.png}
+    \caption{в шатуне}
+    \label{fig:p2r_shift}
+\end{figure}
 
 \clearpage
 \section{Заключение}
 
-В ходе выполнения проекта разработан и обоснован прототип переносного поршневого насоса с электрическим приводом на базе кривошипно-ползунного механизма, предназначенного для подъёма пресной проточной воды при обеспечении расчётного напора до 30 м.
+В ходе выполнения проекта разработан и обоснован прототип переносного поршневого насоса с электрическим приводом на базе кривошипно-ползунного механизма, предназначенного для подъёма пресной проточной воды при обеспечении расчётного напора до {{H}} м.
 
 \subsection{Поэтапные итоги}
 \begin{enumerate}
-    \item Выполнено формирование требований к изделию и условий эксплуатации:
-        определены показатели мобильности (переносное исполнение, ограничение габаритов и массы, требования к центровке),
-        а также требования безопасности (защита движущихся элементов, требования к корпусу и электроприводу IP44).
-    \item Проведён расчёт исходных гидравлических параметров: по заданным $Q$, $\rho$, $H$ определено давление $P\approx0.32\text{ МПа}$ и
-        полезная мощность $N_{\text{used}}\approx {{N_used_val}} \text{ Вт}$; с учётом суммарного КПД $\eta_{\Sigma}={{eta_Sigma}}$
-        обоснована требуемая мощность электропривода порядка 54 Вт.
+    \item Проведён расчёт исходных гидравлических параметров: по заданным $Q$, $\rho$, $H$ определено давление
+        $P\approx {{ (1e-6 * P_val) | round(6) }} \text{ МПа}$ и полезная мощность
+        $N_{\text{used}}\approx {{N_val | round(3)}} \text{ Вт}$; с учётом суммарного КПД $\eta_{\Sigma}={{eta_Sigma}}$
+        обоснована требуемая мощность электропривода порядка {{N_used_val | round(3)}} Вт.
     \item Рассмотрена неравномерность подачи поршневого насоса и выбран способ её снижения:
         применена многократность — три цилиндра параллельно со сдвигом фаз $120^\circ$, что по расчётной оценке существенно
         уменьшает пульсацию расхода по сравнению с одиночным цилиндром.
@@ -1068,16 +1112,13 @@ TODO: image missing (a lot)
     \item Проведён уточнённый силовой анализ с учётом сил инерции по методу Д’Аламбера: оценены массы звеньев и инерционные составляющие,
         установлено, что их вклад в основные силовые факторы составляет порядка $0.1\ldots1.5\%$, а в приводной момент — порядка нескольких процентов.
     \item Выполнена проверка применимости квазистатического расчёта: консервативно показано,
-        что изменение максимумов $M_A$, $Z_A$, $Z_C$ при учёте инерции не превышает $\sim 7.3\%$,
-        что существенно меньше принятого коэффициента запаса $n_{\min}=2.2$; следовательно, принятые расчётные зависимости
+        что изменение максимумов $M_A$, $Z_A$, $Z_C$ при учёте инерции не превышает $\sim 0.7\%$,
+        что существенно меньше принятого коэффициента запаса $n_{запаса}=2.2$; следовательно, принятые расчётные зависимости
         являются обоснованными для дальнейшего проектирования.
     \item На конструкторской стадии разработаны 3D-модели механизма (первичная и базовая),
         выполнена корректировка компоновки (дисковый/сборный коленвал, переработка узлов разборности и соединений),
         а также проведён МКЭ-анализ звеньев с последующей модификацией геометрии для снижения концентраций напряжений
         (скругления и сглаживания кромок в наиболее нагруженных зонах).
-    \item На технологической стадии обосновано изготовление прототипов методом 3D-печати из PLA,
-        произведена сборка с применением стандартного крепежа (М6×20) и технологических замен для элементов,
-        затруднительных в печати (имитация резьбовых деталей для крышек валов).
 
 \end{enumerate}
 
@@ -1092,15 +1133,23 @@ TODO: image missing (a lot)
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=\linewidth]{img/washbasin_specs.png}
-    \caption{Характеристики умывальника согласно документу СНиП 2.04.01-85*}
+    \caption{Характеристики умывальника согласно документу СНиП 2.04.01-85}
     \label{fig:washbasin_specs}
 \end{figure}
 
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=\linewidth]{img/pump_specs.png}
-    \caption{TODO}
+    \caption{Спецификация насосов}
     \label{fig:pump_specs}
 \end{figure}
 
+\clearpage
+\lstinputlisting[style=python, caption={Основной расчетный скрипт}, label={lst:main_script}]{main.py}
+\clearpage
+\lstinputlisting[style=python, caption={Скрипт для генерации графиков}, label={lst:graphs_script}]{graphs.py}
+
+\nocite{*}
+\clearpage
+\bibliography{references}
 \end{document}

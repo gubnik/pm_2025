@@ -1,5 +1,8 @@
 TEX=xelatex
-TEX_FLAGS=-quiet
+TEX_FLAGS=
+
+BIBTEX=bibtex
+BIBTEX_FLAGS=gen.main.aux
 
 MAIN_BUILD_SCRIPT=main.py
 TITLEPAGE_BUILD_SCRIPT=titlepage.py
@@ -15,6 +18,8 @@ GRAPHS += img/gen/pulse_7.png
 all: gen.main.pdf
 
 gen.main.pdf: gen.main.tex gen.titlepage.tex $(GRAPHS)
+	$(TEX) $(TEX_FLAGS) $< 
+	$(BIBTEX) $(BIBTEX_FLAGS)
 	$(TEX) $(TEX_FLAGS) $< 
 	$(TEX) $(TEX_FLAGS) $<
 
