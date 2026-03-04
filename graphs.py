@@ -63,7 +63,7 @@ if __name__ == "__main__":
     subs = substitutes(cs, eqs)
     q_Sigma_min = main.min_in_range(q_Norm_fn, np.arange(0, 2 * math.pi, 0.01), n = 3)
     for k in [1, 3, 5, 7]:
-        plot_to_png(f"img/gen/pulse_{k}.png", lambda phi: q_Norm_fn(phi, k), np.arange(0, 2 * np.pi, 0.01),
+        plot_to_png(f"img/gen/pulse_{k}.png", lambda phi: 100 * q_Norm_fn(phi, k), np.arange(0, 2 * np.pi, 0.01),
                     x_label=caption_phi,
                     y_label="Относительный моментальный расход (%)",
                     do_pi_labels=True)
@@ -105,7 +105,7 @@ if __name__ == "__main__":
                   legend=[f"Точка {p}" for p in points],
                   test_range=np.arange(0, 2 * np.pi, 0.01),
                   x_label=caption_phi,
-                  y_label=f"v_x, скорость по оси y, м/с",
+                  y_label=f"v_y, скорость по оси y, м/с",
                   do_pi_labels=True)
     plot_multiple(filename=f"img/gen/vel_mod.png",
                   functions=[lambda phi, v_x_f=v_x_f, v_y_f=v_y_f: math.sqrt(v_x_f(phi)**2 + v_y_f(phi)**2)
@@ -113,7 +113,7 @@ if __name__ == "__main__":
                   legend=[f"Точка {p}" for p in points],
                   test_range=np.arange(0, 2 * np.pi, 0.01),
                   x_label=caption_phi,
-                  y_label=f"v_x, скорость по оси y, м/с",
+                  y_label=f"модуль скорости |v|, м/с",
                 do_pi_labels=True)
     plot_multiple(filename=f"img/gen/acc_x.png",
                   functions=a_x_fs,
@@ -127,7 +127,7 @@ if __name__ == "__main__":
                   legend=[f"Точка {p}" for p in points],
                   test_range=np.arange(0, 2 * np.pi, 0.01),
                   x_label=caption_phi,
-                  y_label=f"a_x, ускорение по оси y, м/с",
+                  y_label=f"a_y, ускорение по оси y, м/с",
                   do_pi_labels=True)
     plot_multiple(filename=f"img/gen/acc_mod.png",
                   functions=[lambda phi, a_x_f=a_x_f, a_y_f=a_y_f: math.sqrt(a_x_f(phi)**2 + a_y_f(phi)**2)
@@ -135,7 +135,7 @@ if __name__ == "__main__":
                   legend=[f"Точка {p}" for p in points],
                   test_range=np.arange(0, 2 * np.pi, 0.01),
                   x_label=caption_phi,
-                  y_label=f"a_x, ускорение по оси y, м/с",
+                  y_label=f"модуль ускорения |a|, м/с",
                   do_pi_labels=True)
     M_A = subs[f'M_A_val'].xreplace({eqs['phi']: phi_symb, sp.diff(eqs['phi']) : omega,
                                 d: d_val})

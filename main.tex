@@ -20,6 +20,8 @@
 \usepackage{mathtools}
 \usepackage{cite}
 \usepackage{listings}
+\usepackage{graphicx}
+\usepackage{subcaption}
 
 \usepackage{setspace}
 \onehalfspacing
@@ -167,7 +169,7 @@ $$
 P = {{rho}} \cdot {{g}} \cdot {{H}}
 $$
 $$
-P = {{ P_val }} \text{ Па} = {{ (P_val / 1000000) | round(3)}} \text{ МПа}
+P = {{ P_val | int }} \text{ Па} = {{ (P_val * 1e-6) | round(6)}} \text{ МПа}
 $$
 
 При рассчете давления необходимо учитывать потери, возникающие в трубопроводе. Эти потери зависят от длины труб, их диаметра,
@@ -340,33 +342,37 @@ $k \approx 1 + \frac{R}{4L} = 1 + \frac{1}{4\lambda}$
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=\linewidth]{img/gen/vel_x.png}
-    \caption{График скоростей точек по оси OX}
-    \label{fig:points_vel_x}
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{img/gen/vel_x.png}
+        \caption{График скоростей точек по оси OX}
+        \label{fig:points_vel_x}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{img/gen/vel_y.png}
+        \caption{График скоростей точек по оси OY}
+        \label{fig:points_vel_y}
+    \end{subfigure}
+
+    \vspace{1em}
+    
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{img/gen/vel_mod.png}
+        \caption{График модулей скоростей точек}
+        \label{fig:points_vel_mod}
+    \end{subfigure}
 \end{figure}
 
-\begin{figure}[!ht]
-    \centering
-    \includegraphics[width=\linewidth]{img/gen/vel_y.png}
-    \caption{График скоростей точек по оси OY}
-    \label{fig:points_vel_y}
-\end{figure}
-
-\begin{figure}[!ht]
-    \centering
-    \includegraphics[width=\linewidth]{img/gen/vel_mod.png}
-    \caption{График модулей скоростей точек}
-    \label{fig:points_vel_mod}
-\end{figure}
-
-\clearpage
 \subsubsection{Ускорения точек}
 \begin{itemize}
 {% for p in points %}
 \item Точка ${{ p }}$:
     \begin{align*}
-        \dot{x}_{{ p }}(\phi) &= {{ phi_print(ctx['a_x_'+p]) -}} \\
-        \dot{y}_{{ p }}(\phi) &= {{ phi_print(ctx['a_y_'+p]) -}} 
+        \ddot{x}_{{ p }}(\phi) &= {{ phi_print(ctx['a_x_'+p]) -}} \\
+        \ddot{y}_{{ p }}(\phi) &= {{ phi_print(ctx['a_y_'+p]) -}} 
     \end{align*}
 {% endfor -%}
 \end{itemize}

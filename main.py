@@ -83,7 +83,6 @@ def equations():
     d, z, n, eta_v, lamb = sp.symbols('d z n eta_v lambda_len')
     b_r, h_r = sp.symbols('b_r h_r')
 
-    lamb = 3
     A_p = sp.pi * (d**2) / 4
     W_p = sp.pi*d**3/32
     A_r = h_r * b_r
@@ -243,7 +242,6 @@ if __name__ == "__main__":
         'max_of_f': max_in_range,
         'solve': sp.solve,
         'solve_for_0': first_root_in_interval
-        #lambda expr, var, min, max, step=0.01, acc=2: next((i for i in np.arange(min, max, step) if round(sp.lambdify(var, expr)(i), acc) == 0), None)
         })
     
     template = env.get_template(sys.argv[1])
