@@ -111,10 +111,10 @@ def equations():
     #M_A = F_BC *(R*sp.cos(phi)*tan_theta + R * sp.sin(phi))
     M_A = F_BC * R * (sp.sin(phi)*cos_theta + sp.cos(phi)*sin_theta)
 
-    sigma_N_crank = Z_A_y / A_r
-    sigma_Q_crank = Z_A_x / A_r
-    sigma_N_rod = F * tan_theta / A_r
-    sigma_Q_rod = F / A_r
+    sigma_Q_crank = Z_A_y / A_r
+    sigma_N_crank = Z_A_x / A_r
+    sigma_Q_rod = F * tan_theta / A_r
+    sigma_N_rod = F / A_r
     sigma_M_crank = M_A / W_r
 
     rho_m = sp.symbols('rho_m')
@@ -140,9 +140,11 @@ def equations():
     I_2 = sp.sqrt(I_2x**2 + I_2y**2)
     I_3 = sp.sqrt(I_3x**2 + I_3y**2)
 
+    theta = sp.asin(sin_theta)
+    omega_theta = sp.diff(theta, phi)
+    epsilon_theta = sp.diff(omega_theta, phi).subs(sp.diff(sp.diff(phi)), 0)
     J_2 = m_2 * L**2 / 12
-    eps = 1/ L
-    J_2_eps = J_2 * eps
+    J_2_eps = sp.Abs(J_2 * epsilon_theta)
 
     return {'t': t, 'phi': phi,
             'P': P, 'Delta_P': Delta_P,
@@ -177,7 +179,7 @@ def equations():
             'I_1x': I_1x, 'I_1y': I_1y, 'I_1': I_1,
             'I_2x': I_2x, 'I_2y': I_2y, 'I_2': I_2,
             'I_3x': I_3x, 'I_3y': I_3y, 'I_3': I_3,
-            'J_2': J_2, 'J_2_eps': J_2_eps,
+            'J_2': J_2, 'epsilon_theta': epsilon_theta, 'J_2_eps': J_2_eps,
             **vels, **accs}
 
 def substitutes(consts, eqs):

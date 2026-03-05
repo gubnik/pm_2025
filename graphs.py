@@ -16,15 +16,17 @@ def q_Sigma_fn(phi: float, n: int) -> float:
 def q_Norm_fn(phi: float, n: int) -> float:
     return q_Sigma_fn(phi, n) / q_Sigma_fn(n * np.pi / 2, n)
 
-def plot_to_png(filename: str, f: Callable, test_range: np.ndarray, x_label: str, y_label: str, do_pi_labels: bool = False):
+def plot_to_png(filename: str, f: Callable, test_range: np.ndarray, x_label: str, y_label: str, label: str = "", do_pi_labels: bool = False):
     vals = [f(i) for i in test_range]
     plt.figure(figsize=(10, 5))
-    plt.plot(test_range, vals, color='blue')
+    plt.plot(test_range, vals, color='blue', label=label)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     if do_pi_labels:
         plt.xticks(np.arange(test_range.min(), test_range.max() + 1, np.pi / 2),
                    [f'{i/2}π' if i != 0 else '0' for i in range(int(test_range.max() / (np.pi/2)) + 2)])
+    if label:
+        plt.legend()
     plt.axhline(0, color='gray', lw=1, ls='--')
     plt.axvline(0, color='gray', lw=1, ls='--')
     plt.grid()
@@ -65,6 +67,7 @@ if __name__ == "__main__":
     for k in [1, 3, 5, 7]:
         plot_to_png(f"img/gen/pulse_{k}.png", lambda phi: 100 * q_Norm_fn(phi, k), np.arange(0, 2 * np.pi, 0.01),
                     x_label=caption_phi,
+                    label=f"{k} цилиндр(-ов)",
                     y_label="Относительный моментальный расход (%)",
                     do_pi_labels=True)
     d = sp.symbols('d')

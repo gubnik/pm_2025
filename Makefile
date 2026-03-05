@@ -17,11 +17,17 @@ GRAPHS += img/gen/pulse_7.png
 
 all: gen.main.pdf
 
+gen.beamer.pdf: gen.beamer.tex
+	$(TEX) $(TEX_FLAGS) $< 
+
+gen.beamer.tex: beamer.tex $(MAIN_BUILD_SCRIPT)
+	./$(MAIN_BUILD_SCRIPT) $< $@
+
 gen.main.pdf: gen.main.tex gen.titlepage.tex $(GRAPHS)
 	$(TEX) $(TEX_FLAGS) $< 
-	@#$(BIBTEX) $(BIBTEX_FLAGS)
-	@#$(TEX) $(TEX_FLAGS) $< 
-	@#$(TEX) $(TEX_FLAGS) $<
+	$(BIBTEX) $(BIBTEX_FLAGS)
+	$(TEX) $(TEX_FLAGS) $< 
+	$(TEX) $(TEX_FLAGS) $<
 
 gen.main.tex: main.tex gen.titlepage.tex $(MAIN_BUILD_SCRIPT)
 	./$(MAIN_BUILD_SCRIPT) $< $@
